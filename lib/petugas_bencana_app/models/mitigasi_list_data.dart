@@ -25,7 +25,7 @@ class MitigasiListData {
     ),
     MitigasiListData(
       imagePath: 'assets/pelaporan_app/cyclone.png',
-      titleTxt: 'Angin',
+      titleTxt: 'Badai',
       mitigasi: <String>['Puting beliung'],
       startColor: '#738AE6',
       endColor: '#5C5EDD',
@@ -38,8 +38,8 @@ class MitigasiListData {
       endColor: '#FF5287',
     ),
     MitigasiListData(
-      imagePath: 'assets/pelaporan_app/dinner.png',
-      titleTxt: 'Dinner',
+      imagePath: 'assets/pelaporan_app/waterfall.png',
+      titleTxt: 'Banjir',
       mitigasi: <String>['Recommend:', ''],
       startColor: '#6F72CA',
       endColor: '#1E1466',

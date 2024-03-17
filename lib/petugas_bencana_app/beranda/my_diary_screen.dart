@@ -216,7 +216,7 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
-                                  'BNPB',
+                                  'BPBD',
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                     fontFamily: PelaporansAppTheme.fontName,
