@@ -1,14 +1,15 @@
+import 'package:flutter/material.dart';
+import 'package:pelaporan_bencana/petugas_bencana_app/cuaca/cuaca_theme.dart';
 import 'package:pelaporan_bencana/petugas_bencana_app/models/tabIcon_data.dart';
 import 'package:pelaporan_bencana/petugas_bencana_app/profil/profil_screen.dart';
-import 'package:flutter/material.dart';
-import 'bottom_navigation_view/bottom_bar_view.dart';
-import 'pelaporan_bencana_app_theme.dart';
-import 'beranda/my_diary_screen.dart';
-
+import 'package:pelaporan_bencana/petugas_bencana_app/bottom_navigation_view/bottom_bar_view.dart';
+import 'package:pelaporan_bencana/petugas_bencana_app/pelaporan_bencana_app_theme.dart';
+import 'package:pelaporan_bencana/petugas_bencana_app/beranda/my_diary_screen.dart';
 
 class PelaporansAppHomeScreen extends StatefulWidget {
   @override
-  _PelaporansAppHomeScreenState createState() => _PelaporansAppHomeScreenState();
+  _PelaporansAppHomeScreenState createState() =>
+      _PelaporansAppHomeScreenState();
 }
 
 class _PelaporansAppHomeScreenState extends State<PelaporansAppHomeScreen>
@@ -80,14 +81,13 @@ class _PelaporansAppHomeScreenState extends State<PelaporansAppHomeScreen>
           tabIconsList: tabIconsList,
           addClick: () {},
           changeIndex: (int index) {
-            if (index == 0 || index == 2) {
+            if (index == 0) {
               animationController?.reverse().then<dynamic>((data) {
                 if (!mounted) {
                   return;
                 }
                 setState(() {
-                  tabBody =
-                      MyDiaryScreen(animationController: animationController);
+                  tabBody = MyDiaryScreen(animationController: animationController);
                 });
               });
             } else if (index == 1 || index == 3) {
@@ -96,8 +96,16 @@ class _PelaporansAppHomeScreenState extends State<PelaporansAppHomeScreen>
                   return;
                 }
                 setState(() {
-                  tabBody =
-                      TrainingScreen(animationController: animationController);
+                  tabBody = TrainingScreen(animationController: animationController);
+                });
+              });
+            } else if (index == 2) {
+              animationController?.reverse().then<dynamic>((data){
+                if (!mounted) {
+                  return;
+                }
+                setState(() {
+                  tabBody = WeatherTheme(); // Perbaikan nama class
                 });
               });
             }
