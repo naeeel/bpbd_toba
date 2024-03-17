@@ -1,18 +1,23 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:animations/animations.dart';
+import 'package:pelaporan_bencana/petugas_bencana_app/pelaporan_bencana_app_home_screen.dart';
+
 
 class CenterNextButton extends StatelessWidget {
   final AnimationController animationController;
   final VoidCallback onNextClick;
-  const CenterNextButton(
-      {Key? key, required this.animationController, required this.onNextClick})
-      : super(key: key);
+  const CenterNextButton({
+    Key? key,
+    required this.animationController,
+    required this.onNextClick,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final _topMoveAnimation =
-        Tween<Offset>(begin: Offset(0, 5), end: Offset(0, 0))
-            .animate(CurvedAnimation(
+    final _topMoveAnimation = Tween<Offset>(
+      begin: Offset(0, 5),
+      end: Offset(0, 0),
+    ).animate(CurvedAnimation(
       parent: animationController,
       curve: Interval(
         0.0,
@@ -20,8 +25,11 @@ class CenterNextButton extends StatelessWidget {
         curve: Curves.fastOutSlowIn,
       ),
     ));
-    final _signUpMoveAnimation =
-        Tween<double>(begin: 0, end: 1.0).animate(CurvedAnimation(
+
+    final _signUpMoveAnimation = Tween<double>(
+      begin: 0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
       parent: animationController,
       curve: Interval(
         0.6,
@@ -29,9 +37,11 @@ class CenterNextButton extends StatelessWidget {
         curve: Curves.fastOutSlowIn,
       ),
     ));
-    final _loginTextMoveAnimation =
-        Tween<Offset>(begin: Offset(0, 5), end: Offset(0, 0))
-            .animate(CurvedAnimation(
+
+    final _loginTextMoveAnimation = Tween<Offset>(
+      begin: Offset(0, 5),
+      end: Offset(0, 0),
+    ).animate(CurvedAnimation(
       parent: animationController,
       curve: Interval(
         0.6,
@@ -41,8 +51,9 @@ class CenterNextButton extends StatelessWidget {
     ));
 
     return Padding(
-      padding:
-          EdgeInsets.only(bottom: 16 + MediaQuery.of(context).padding.bottom),
+      padding: EdgeInsets.only(
+        bottom: 16 + MediaQuery.of(context).padding.bottom,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -53,7 +64,7 @@ class CenterNextButton extends StatelessWidget {
               animation: animationController,
               builder: (context, child) => AnimatedOpacity(
                 opacity: animationController.value >= 0.2 &&
-                        animationController.value <= 0.6
+                    animationController.value <= 0.6
                     ? 1
                     : 0,
                 duration: Duration(milliseconds: 480),
@@ -67,23 +78,25 @@ class CenterNextButton extends StatelessWidget {
               animation: animationController,
               builder: (context, child) => Padding(
                 padding: EdgeInsets.only(
-                    bottom: 38 - (38 * _signUpMoveAnimation.value)),
+                  bottom: 38 - (38 * _signUpMoveAnimation.value),
+                ),
                 child: Container(
                   height: 58,
                   width: 58 + (200 * _signUpMoveAnimation.value),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(
-                        8 + 32 * (1 - _signUpMoveAnimation.value)),
+                      8 + 32 * (1 - _signUpMoveAnimation.value),
+                    ),
                     color: Color(0xFFF28920),
                   ),
                   child: PageTransitionSwitcher(
                     duration: Duration(milliseconds: 480),
                     reverse: _signUpMoveAnimation.value < 0.7,
                     transitionBuilder: (
-                      Widget child,
-                      Animation<double> animation,
-                      Animation<double> secondaryAnimation,
-                    ) {
+                        Widget child,
+                        Animation<double> animation,
+                        Animation<double> secondaryAnimation,
+                        ) {
                       return SharedAxisTransition(
                         fillColor: Colors.transparent,
                         child: child,
@@ -94,37 +107,49 @@ class CenterNextButton extends StatelessWidget {
                     },
                     child: _signUpMoveAnimation.value > 0.7
                         ? InkWell(
-                            key: ValueKey('Sign Up button'),
-                            onTap: onNextClick,
-                            child: Padding(
-                              padding: EdgeInsets.only(left: 16.0, right: 16.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Sign Up',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Icon(Icons.arrow_forward_rounded,
-                                      color: Colors.white),
-                                ],
+                      key: ValueKey('Sign Up button'),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PelaporansAppHomeScreen(),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding:
+                        EdgeInsets.only(left: 16.0, right: 16.0),
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                          )
-                        : InkWell(
-                            key: ValueKey('next button'),
-                            onTap: onNextClick,
-                            child: Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Icon(Icons.arrow_forward_ios_rounded,
-                                  color: Colors.white),
+                            Icon(
+                              Icons.arrow_forward_rounded,
+                              color: Colors.white,
                             ),
-                          ),
+                          ],
+                        ),
+                      ),
+                    )
+                        : InkWell(
+                      key: ValueKey('next button'),
+                      onTap: onNextClick,
+                      child: Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -145,18 +170,21 @@ class CenterNextButton extends StatelessWidget {
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                  Text(
-                    'Login',
-                    style: TextStyle(
-                      color: Color(0xFFF28920),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  InkWell(
+                    child: Text(
+                      'Login',
+                      style: TextStyle(
+                        color: Color(0xFFF28920),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
           ),
+
         ],
       ),
     );
