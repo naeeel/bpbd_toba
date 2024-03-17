@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pelaporan_bencana/petugas_bencana_app/cuaca/weather_service.dart';
 import 'package:pelaporan_bencana/petugas_bencana_app/cuaca/weather_model.dart';
@@ -87,6 +88,31 @@ class _WeatherThemeState extends State<WeatherTheme> {
     }
   }
 
+  IconData getWeatherIcon({String? mainCondition}) {
+    if (mainCondition == null) return Icons.wb_sunny;
+
+    switch (mainCondition.toLowerCase()) {
+      case 'clouds':
+        return Icons.cloud;
+      case 'mist':
+      case 'smoke':
+      case 'haze':
+      case 'dust':
+      case 'fog':
+        return Icons.filter_drama;
+      case 'rain':
+      case 'drizzle':
+      case 'shower rain':
+        return Icons.beach_access;
+      case 'thunderstorm':
+        return Icons.flash_on;
+      case 'clear':
+        return Icons.wb_sunny;
+      default:
+        return Icons.wb_sunny;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,7 +125,7 @@ class _WeatherThemeState extends State<WeatherTheme> {
             children: [
               Text(
                 _weather != null
-                    ? '${_weather?.cityName ?? ""}, ${_weather?.county ?? ""}, ${_weather?.district ?? ""}'
+                    ? '${_weather?.cityName ?? ""}'
                     : 'Loading location...',
                 style: TextStyle(
                   fontSize: 24,
@@ -120,6 +146,15 @@ class _WeatherThemeState extends State<WeatherTheme> {
                 style: TextStyle(
                   fontSize: 34,
                   fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(
+                _weather != null
+                    ? 'Wind Speed: ${_weather?.windSpeed ?? 0} m/s'
+                    : 'Loading wind speed...',
+                style: TextStyle(
+                  fontSize: 16,
                 ),
               ),
               SizedBox(height: 20),
@@ -175,7 +210,7 @@ class _WeatherThemeState extends State<WeatherTheme> {
           children: forecasts.map((forecast) {
             return WeatherForecastCard(
               forecast: forecast,
-              backgroundColor: Colors.grey.withOpacity(0.5),
+              animationAsset: getWeatherAnimation(mainCondition: forecast.mainCondition),
             );
           }).toList(),
         ),
@@ -201,69 +236,68 @@ class _WeatherThemeState extends State<WeatherTheme> {
 
 class WeatherForecastCard extends StatelessWidget {
   final WeatherModel forecast;
-  final VoidCallback? onTap;
-  final bool isExpanded;
-  final Color backgroundColor;
+  final String animationAsset;
 
   WeatherForecastCard({
     required this.forecast,
-    this.onTap,
-    this.isExpanded = false,
-    required this.backgroundColor,
+    required this.animationAsset,
   });
-
-  String getWeatherAnimation({String? mainCondition}) {
-    if (mainCondition == null) return 'assets/animation/sunny.json';
-
-    switch (mainCondition.toLowerCase()) {
-      case 'clouds':
-      case 'mist':
-      case 'smoke':
-      case 'haze':
-      case 'dust':
-      case 'fog':
-        return 'assets/animation/cloud.json';
-      case 'rain':
-        return 'assets/animation/rain.json';
-      case 'drizzle':
-      case 'shower rain':
-        return 'assets/animation/rain.json';
-      case 'thunderstorm':
-        return 'assets/animation/thunder.json';
-      case 'clear':
-        return 'assets/animation/sunny.json';
-      default:
-        return 'assets/animation/sunny.json';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            height: 50,
-            width: 50,
-            child: Lottie.asset(
-              getWeatherAnimation(mainCondition: forecast.mainCondition),
-            ),
-          ),
-          SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${forecast.dateTime.hour}:00, ${forecast.temperature.round()}°C, ${forecast.mainCondition}, ${forecast.windSpeed} m/s Wind',
-                style: TextStyle(
-                  fontSize: 14,
+    return Card(
+      elevation: 4,
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${forecast.dateTime.hour}:00',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
+                SizedBox(height: 5),
+                Text(
+                  '${forecast.temperature.round()}°C',
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  '${forecast.mainCondition}',
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  'Wind Speed: ${forecast.windSpeed} m/s',
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(width: 20),
+            SizedBox(
+              height: 60, // Atur tinggi gambar cuaca di sini
+              width: 60, // Atur lebar gambar cuaca di sini
+              child: Lottie.asset(
+                animationAsset,
+                repeat: true,
+                reverse: false,
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
