@@ -23,6 +23,8 @@ dependencies:
             ref: feature/remoce_accentcolor
     geolocator: ^11.0.0
     geocoding: ^3.0.0
+    flutter_svg: ^2.0.10+1
+    flutter_hooks: ^0.20.5
 
 dev_dependencies:
     flutter_test:
