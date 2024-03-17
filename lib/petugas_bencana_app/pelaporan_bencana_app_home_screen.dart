@@ -3,7 +3,7 @@ import 'package:pelaporan_bencana/petugas_bencana_app/profil/profil_screen.dart'
 import 'package:flutter/material.dart';
 import 'bottom_navigation_view/bottom_bar_view.dart';
 import 'pelaporan_bencana_app_theme.dart';
-import 'my_diary/my_diary_screen.dart';
+import 'beranda/my_diary_screen.dart';
 
 
 class PelaporansAppHomeScreen extends StatefulWidget {

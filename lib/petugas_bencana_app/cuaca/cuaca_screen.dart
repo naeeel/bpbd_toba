@@ -1,20 +1,15 @@
-import 'package:pelaporan_bencana/petugas_bencana_app/ui_view/laporan_masyarakat_view.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/ui_view/glass_view.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/ui_view/bencana_terkini_view.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/ui_view/title_view.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/pelaporan_bencana_app_theme.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/my_diary/mitigasi_list_view.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/my_diary/water_view.dart';
 import 'package:flutter/material.dart';
-class MyDiaryScreen extends StatefulWidget {
-  const MyDiaryScreen({Key? key, this.animationController}) : super(key: key);
+
+class WeatherReportScreen extends StatefulWidget {
+  const WeatherReportScreen({Key? key, this.animationController}) : super(key: key);
 
   final AnimationController? animationController;
+
   @override
-  _MyDiaryScreenState createState() => _MyDiaryScreenState();
+  _WeatherReportScreenState createState() => _WeatherReportScreenState();
 }
 
-class _MyDiaryScreenState extends State<MyDiaryScreen>
+class _WeatherReportScreenState extends State<WeatherReportScreen>
     with TickerProviderStateMixin {
   Animation<double>? topBarAnimation;
 
@@ -60,38 +55,37 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
 
     listViews.add(
       TitleView(
-        titleTxt: 'Bencana terkini',
-      
+        titleTxt: 'Weather Report',
         animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
             parent: widget.animationController!,
             curve:
-                Interval((1 / count) * 0, 1.0, curve: Curves.fastOutSlowIn))),
+            Interval((1 / count) * 0, 1.0, curve: Curves.fastOutSlowIn))),
         animationController: widget.animationController!,
       ),
     );
     listViews.add(
-      MediterranesnDietView(
+      DisasterReportView(
         animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
             parent: widget.animationController!,
             curve:
-                Interval((1 / count) * 1, 1.0, curve: Curves.fastOutSlowIn))),
+            Interval((1 / count) * 1, 1.0, curve: Curves.fastOutSlowIn))),
         animationController: widget.animationController!,
       ),
     );
     listViews.add(
       TitleView(
-        titleTxt: 'Mitigasi',
-        subTxt: 'Selengkapnya',
+        titleTxt: 'Mitigation',
+        subTxt: 'More',
         animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
             parent: widget.animationController!,
             curve:
-                Interval((1 / count) * 2, 1.0, curve: Curves.fastOutSlowIn))),
+            Interval((1 / count) * 2, 1.0, curve: Curves.fastOutSlowIn))),
         animationController: widget.animationController!,
       ),
     );
 
     listViews.add(
-      mitigasiListView(
+      MitigationListView(
         mainScreenAnimation: Tween<double>(begin: 0.0, end: 1.0).animate(
             CurvedAnimation(
                 parent: widget.animationController!,
@@ -103,12 +97,12 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
 
     listViews.add(
       TitleView(
-        titleTxt: 'Laporan Masyarakat',
+        titleTxt: 'Public Reports',
         subTxt: 'Today',
         animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
             parent: widget.animationController!,
             curve:
-                Interval((1 / count) * 4, 1.0, curve: Curves.fastOutSlowIn))),
+            Interval((1 / count) * 4, 1.0, curve: Curves.fastOutSlowIn))),
         animationController: widget.animationController!,
       ),
     );
@@ -118,40 +112,9 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
         animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
             parent: widget.animationController!,
             curve:
-                Interval((1 / count) * 5, 1.0, curve: Curves.fastOutSlowIn))),
+            Interval((1 / count) * 5, 1.0, curve: Curves.fastOutSlowIn))),
         animationController: widget.animationController!,
       ),
-    );
-    listViews.add(
-      TitleView(
-        titleTxt: 'Water',
-        subTxt: 'Aqua SmartBottle',
-        animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-            parent: widget.animationController!,
-            curve:
-                Interval((1 / count) * 6, 1.0, curve: Curves.fastOutSlowIn))),
-        animationController: widget.animationController!,
-      ),
-    );
-
-    listViews.add(
-      WaterView(
-        mainScreenAnimation: Tween<double>(begin: 0.0, end: 1.0).animate(
-            CurvedAnimation(
-                parent: widget.animationController!,
-                curve: Interval((1 / count) * 7, 1.0,
-                    curve: Curves.fastOutSlowIn))),
-        mainScreenAnimationController: widget.animationController!,
-      ),
-    );
-    listViews.add(
-      GlassView(
-          animation: Tween<double>(begin: 0.0, end: 1.0).animate(
-              CurvedAnimation(
-                  parent: widget.animationController!,
-                  curve: Interval((1 / count) * 8, 1.0,
-                      curve: Curves.fastOutSlowIn))),
-          animationController: widget.animationController!),
     );
   }
 
@@ -163,7 +126,7 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: PelaporansAppTheme.background,
+      color: Colors.white,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Stack(
@@ -219,14 +182,13 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
                     0.0, 30 * (1.0 - topBarAnimation!.value), 0.0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: PelaporansAppTheme.white.withOpacity(topBarOpacity),
+                    color: Colors.white.withOpacity(topBarOpacity),
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(32.0),
                     ),
                     boxShadow: <BoxShadow>[
                       BoxShadow(
-                          color: PelaporansAppTheme.grey
-                              .withOpacity(0.4 * topBarOpacity),
+                          color: Colors.grey.withOpacity(0.4 * topBarOpacity),
                           offset: const Offset(1.1, 1.1),
                           blurRadius: 10.0),
                     ],
@@ -249,20 +211,17 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
-                                  'BNPB',
+                                  'Weather App',
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
-                                    fontFamily: PelaporansAppTheme.fontName,
                                     fontWeight: FontWeight.w700,
                                     fontSize: 22 + 6 - 6 * topBarOpacity,
                                     letterSpacing: 1.2,
-                                    color: Color(0xFFF28920),
+                                    color: Colors.blue,
                                   ),
                                 ),
                               ),
                             ),
-                        
-                          
                           ],
                         ),
                       )
@@ -274,6 +233,192 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
           },
         )
       ],
+    );
+  }
+}
+
+class TitleView extends StatelessWidget {
+  const TitleView({
+    Key? key,
+    required this.titleTxt,
+    this.subTxt,
+    required this.animationController,
+    required this.animation,
+  }) : super(key: key);
+
+  final String titleTxt;
+  final String? subTxt;
+  final AnimationController animationController;
+  final Animation<double> animation;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animationController,
+      builder: (BuildContext context, Widget? child) {
+        return FadeTransition(
+          opacity: animation,
+          child: Transform(
+            transform: Matrix4.translationValues(
+                0.0, 30 * (1.0 - animation.value), 0.0),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 24, right: 24, top: 16, bottom: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    titleTxt,
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                      letterSpacing: 0.5,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      subTxt ?? '',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        letterSpacing: 0.5,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class DisasterReportView extends StatelessWidget {
+  const DisasterReportView({
+    Key? key,
+    required this.animationController,
+    required this.animation,
+  }) : super(key: key);
+
+  final AnimationController animationController;
+  final Animation<double> animation;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animationController,
+      builder: (BuildContext context, Widget? child) {
+        return FadeTransition(
+          opacity: animation,
+          child: Transform(
+            transform: Matrix4.translationValues(
+                0.0, 30 * (1.0 - animation.value), 0.0),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                elevation: 5,
+                child: ListTile(
+                  leading: Icon(Icons.warning, color: Colors.red),
+                  title: Text('Current Disasters'),
+                  subtitle: Text('List of ongoing disasters'),
+                  onTap: () {
+                    // Add your onTap action here
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class MitigationListView extends StatelessWidget {
+  const MitigationListView({
+    Key? key,
+    required this.mainScreenAnimationController,
+    required this.mainScreenAnimation,
+  }) : super(key: key);
+
+  final AnimationController? mainScreenAnimationController;
+  final Animation<double>? mainScreenAnimation;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: mainScreenAnimationController!,
+      builder: (BuildContext context, Widget? child) {
+        return FadeTransition(
+          opacity: mainScreenAnimation!,
+          child: Transform(
+            transform: Matrix4.translationValues(
+                0.0, 30 * (1.0 - mainScreenAnimation!.value), 0.0),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                elevation: 5,
+                child: ListTile(
+                  leading: Icon(Icons.healing, color: Colors.green),
+                  title: Text('Mitigation Measures'),
+                  subtitle: Text('List of mitigation measures'),
+                  onTap: () {
+                    // Add your onTap action here
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class BodyMeasurementView extends StatelessWidget {
+  const BodyMeasurementView({
+    Key? key,
+    required this.animationController,
+    required this.animation,
+  }) : super(key: key);
+
+  final AnimationController? animationController;
+  final Animation<double>? animation;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animationController!,
+      builder: (BuildContext context, Widget? child) {
+        return FadeTransition(
+          opacity: animation!,
+          child: Transform(
+            transform: Matrix4.translationValues(
+                0.0, 30 * (1.0 - animation!.value), 0.0),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                elevation: 5,
+                child: ListTile(
+                  leading: Icon(Icons.report, color: Colors.blue),
+                  title: Text('Public Reports'),
+                  subtitle: Text('List of public reports'),
+                  onTap: () {
+                    // Add your onTap action here
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
