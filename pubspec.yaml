@@ -25,6 +25,7 @@ dependencies:
     geocoding: ^3.0.0
     flutter_svg: ^2.0.10+1
     flutter_hooks: ^0.20.5
+    image_picker: ^0.8.4+4
 
 dev_dependencies:
     flutter_test:
