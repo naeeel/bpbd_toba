@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "225688290928",
+    "project_id": "resqube-1b969",
+    "storage_bucket": "resqube-1b969.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:225688290928:android:5e40320cae78f785fd16b5",
+        "android_client_info": {
+          "package_name": "com.example.best_flutter_ui_templates"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPnRPiJBJTT6HjG5kR8gowXxdiGGAU3jU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:225688290928:android:3a81c1ec32a39e74fd16b5",
+        "android_client_info": {
+          "package_name": "com.example.pelaporan_bencana_alam"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPnRPiJBJTT6HjG5kR8gowXxdiGGAU3jU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
