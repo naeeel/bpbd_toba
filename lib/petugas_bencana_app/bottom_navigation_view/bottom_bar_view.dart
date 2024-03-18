@@ -1,8 +1,11 @@
 import 'dart:math' as math;
+import 'package:pelaporan_bencana/petugas_bencana_app/Lapor/laporkan.dart';
 import 'package:pelaporan_bencana/petugas_bencana_app/pelaporan_bencana_app_theme.dart';
 import 'package:pelaporan_bencana/petugas_bencana_app/models/tabIcon_data.dart';
 import 'package:pelaporan_bencana/main.dart';
 import 'package:flutter/material.dart';
+
+
 
 import '../../main.dart';
 
@@ -165,11 +168,16 @@ class _BottomBarViewState extends State<BottomBarView>
                           splashColor: Colors.white.withOpacity(0.1),
                           highlightColor: Colors.transparent,
                           focusColor: Colors.transparent,
-                          onTap: widget.addClick,
-                          child: Icon(
-                            Icons.add,
-                            color: PelaporansAppTheme.white,
-                            size: 32,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => LaporPage()),
+                            );
+                          },
+                          child: Image.asset(
+                            'assets/introduction_animation/bnpb2.png',
+                              height: 32,
+                              width: 32,
                           ),
                         ),
                       ),
