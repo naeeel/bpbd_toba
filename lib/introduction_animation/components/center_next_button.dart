@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
+import 'package:pelaporan_bencana/petugas_bencana_app/autentifikasi/login_screen.dart';
 import 'package:pelaporan_bencana/petugas_bencana_app/pelaporan_bencana_app_home_screen.dart';
-
 
 class CenterNextButton extends StatelessWidget {
   final AnimationController animationController;
@@ -112,7 +112,7 @@ class CenterNextButton extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PelaporansAppHomeScreen(),
+                            builder: (context) => LoginPage(),
                           ),
                         );
                       },
@@ -171,6 +171,14 @@ class CenterNextButton extends StatelessWidget {
                     ),
                   ),
                   InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PelaporansAppHomeScreen(),
+                        ),
+                      );
+                    },
                     child: Text(
                       'Login',
                       style: TextStyle(

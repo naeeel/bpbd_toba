@@ -55,6 +55,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '225688290928',
     projectId: 'resqube-1b969',
     authDomain: 'resqube-1b969.firebaseapp.com',
+    databaseURL: 'https://resqube-1b969-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'resqube-1b969.appspot.com',
   );
 
@@ -63,6 +64,7 @@ class DefaultFirebaseOptions {
     appId: '1:225688290928:android:5e40320cae78f785fd16b5',
     messagingSenderId: '225688290928',
     projectId: 'resqube-1b969',
+    databaseURL: 'https://resqube-1b969-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'resqube-1b969.appspot.com',
   );
 }
