@@ -9,8 +9,7 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage>
-    with SingleTickerProviderStateMixin {
+class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   TextEditingController _phoneController = TextEditingController();
@@ -100,7 +99,12 @@ class _LoginPageState extends State<LoginPage>
                           ),
                         ),
                         validator: (value) {
-                          if (value!.length != 11) return "Invalid phone number";
+                          if (value!.isEmpty || !value.startsWith("8")) {
+                            return "Please enter a valid Indonesian phone number";
+                          }
+                          if (value.length < 11 || value.length > 13) {
+                            return "Invalid phone number";
+                          }
                           return null;
                         },
                       ),

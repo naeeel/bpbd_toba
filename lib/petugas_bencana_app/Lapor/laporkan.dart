@@ -3,7 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pelaporan_bencana/petugas_bencana_app/Lapor/location_picker_map.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' show LatLng;
-import 'package:firebase_database/firebase_database.dart'; // Import Firebase Realtime Database
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Laporkan Bencana',
+      theme: ThemeData(
+        primarySwatch: Colors.orange,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: LaporPage(),
+    );
+  }
+}
 
 class LaporPage extends StatefulWidget {
   @override
@@ -15,6 +33,7 @@ class _LaporPageState extends State<LaporPage> {
   File? _pickedImage;
   LatLng? _selectedLocation;
   final TextEditingController _keteranganController = TextEditingController();
+  bool _isDataSent = false;
 
   @override
   Widget build(BuildContext context) {
@@ -113,15 +132,22 @@ class _LaporPageState extends State<LaporPage> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () => _submitReport(context),
+                onPressed: _isDataSent ? null : () => _submitReport(context),
                 style: ButtonStyle(
-                  backgroundColor:
-                  MaterialStateProperty.all<Color>(Colors.orange),
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                      _isDataSent ? Colors.grey : Colors.orange),
                   minimumSize: MaterialStateProperty.all<Size>(
                       Size(double.infinity, 50)),
                 ),
                 child: Text('Laporkan'),
               ),
+              SizedBox(height: 10),
+              _isDataSent
+                  ? Text(
+                'Data sudah terkirim!',
+                style: TextStyle(color: Colors.green),
+              )
+                  : SizedBox(),
             ],
           ),
         ),
@@ -166,30 +192,14 @@ class _LaporPageState extends State<LaporPage> {
       return;
     }
 
-    // Referensi database Firebase
-    DatabaseReference databaseRef = FirebaseDatabase.instance.reference();
+    // Simpan laporan ke database (dalam contoh ini, laporan tidak disimpan ke database)
 
-    // Buat objek laporan
-    Map<String, dynamic> reportData = {
-      'jenis_bencana': _selectedDisasterType,
-      'lokasi': {
-        'latitude': _selectedLocation!.latitude,
-        'longitude': _selectedLocation!.longitude,
-      },
-      'keterangan': _keteranganController.text,
-    };
-
-    // Simpan laporan ke database
-    databaseRef.child('laporan').push().set(reportData).then((_) {
-      // Tampilkan pesan sukses
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Laporan berhasil dikirim.'),
-      ));
-    }).catchError((error) {
-      // Tampilkan pesan error jika gagal mengirimkan laporan
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Terjadi kesalahan saat menyimpan laporan: $error'),
-      ));
+    // Tampilkan pesan sukses
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Laporan berhasil dikirim.'),
+    ));
+    setState(() {
+      _isDataSent = true;
     });
   }
 }

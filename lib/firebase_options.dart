@@ -50,21 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyANTtKEsy46br9IOSUff99_qW2ePTXI5ls',
-    appId: '1:225688290928:web:630fb2848bab045ffd16b5',
-    messagingSenderId: '225688290928',
-    projectId: 'resqube-1b969',
-    authDomain: 'resqube-1b969.firebaseapp.com',
-    databaseURL: 'https://resqube-1b969-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'resqube-1b969.appspot.com',
+    apiKey: 'AIzaSyDqkc_fljGKJwZ4Gf_xg_Xq3kTj4eOhzis',
+    appId: '1:198425241256:web:0cb6aaa401d064e343449d',
+    messagingSenderId: '198425241256',
+    projectId: 'resqube-bcc0b',
+    authDomain: 'resqube-bcc0b.firebaseapp.com',
+    storageBucket: 'resqube-bcc0b.appspot.com',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAPnRPiJBJTT6HjG5kR8gowXxdiGGAU3jU',
-    appId: '1:225688290928:android:5e40320cae78f785fd16b5',
-    messagingSenderId: '225688290928',
-    projectId: 'resqube-1b969',
-    databaseURL: 'https://resqube-1b969-default-rtdb.asia-southeast1.firebasedatabase.app',
-    storageBucket: 'resqube-1b969.appspot.com',
+    apiKey: 'AIzaSyChYU8B6EfdMMPgsuoDULnG7M8jOoccJX4',
+    appId: '1:198425241256:android:f178f1bc168f883143449d',
+    messagingSenderId: '198425241256',
+    projectId: 'resqube-bcc0b',
+    storageBucket: 'resqube-bcc0b.appspot.com',
   );
+
 }

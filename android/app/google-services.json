@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "225688290928",
-    "firebase_url": "https://resqube-1b969-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "resqube-1b969",
-    "storage_bucket": "resqube-1b969.appspot.com"
+    "project_number": "198425241256",
+    "project_id": "resqube-bcc0b",
+    "storage_bucket": "resqube-bcc0b.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:225688290928:android:5e40320cae78f785fd16b5",
+        "mobilesdk_app_id": "1:198425241256:android:f178f1bc168f883143449d",
         "android_client_info": {
           "package_name": "com.example.best_flutter_ui_templates"
         }
@@ -16,26 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAPnRPiJBJTT6HjG5kR8gowXxdiGGAU3jU"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:225688290928:android:3a81c1ec32a39e74fd16b5",
-        "android_client_info": {
-          "package_name": "com.example.pelaporan_bencana_alam"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAPnRPiJBJTT6HjG5kR8gowXxdiGGAU3jU"
+          "current_key": "AIzaSyChYU8B6EfdMMPgsuoDULnG7M8jOoccJX4"
         }
       ],
       "services": {
