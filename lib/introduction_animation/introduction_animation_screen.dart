@@ -1,6 +1,5 @@
 import 'package:pelaporan_bencana/introduction_animation/components/slide3_view.dart';
 import 'package:pelaporan_bencana/introduction_animation/components/center_next_button.dart';
-import 'package:pelaporan_bencana/introduction_animation/components/slide3_view.dart';
 import 'package:pelaporan_bencana/introduction_animation/components/slide2_view.dart';
 import 'package:pelaporan_bencana/introduction_animation/components/slide1_view.dart';
 import 'package:pelaporan_bencana/introduction_animation/components/top_back_skip_view.dart';

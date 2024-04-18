@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:pelaporan_bencana/petugas_bencana_app/controllers/auth_service.dart';
 import 'package:pelaporan_bencana/petugas_bencana_app/pelaporan_bencana_app_home_screen.dart';
@@ -9,7 +10,8 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
+class _LoginPageState extends State<LoginPage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   TextEditingController _phoneController = TextEditingController();
@@ -67,25 +69,37 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         child: Container(
           height: MediaQuery.of(context).size.height,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
+              Container(
+                width: 200, // Atur lebar sesuai kebutuhan
+                height: 200, // Atur tinggi sesuai kebutuhan
                 child: Image.asset(
-                  "assets/pelaporan_app/login.png",
+                  "assets/pelaporan_app/log-in.png",
                   fit: BoxFit.cover,
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.fromLTRB(12.0, 0, 12.0, 40.0), // Mengatur margin bottom
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center, // Mengatur kolom menjadi rata tengah
                   children: [
+                                Text(
+              "Welcome Back",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 32,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
                     Text(
-                      "Welcome Back 👋",
-                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.w700),
+                      "masukkan nomor telepon kamu yaa!!",
+                      
+                      textAlign: TextAlign.center, // Mengatur teks menjadi rata tengah
                     ),
-                    Text("Enter your phone number to continue."),
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                     Form(
                       key: _formKey,
                       child: TextFormField(
@@ -93,14 +107,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
                           prefixText: "+62 ",
-                          labelText: "Enter your phone number",
+                          labelText: "Masukkan nomor telepon",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(32),
                           ),
                         ),
                         validator: (value) {
                           if (value!.isEmpty || !value.startsWith("8")) {
-                            return "Please enter a valid Indonesian phone number";
+                            return "masukkan nomor telepon anda dengan benar";
                           }
                           if (value.length < 11 || value.length > 13) {
                             return "Invalid phone number";
@@ -162,6 +176,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                       TextButton(
                                         onPressed: () => handleSubmit(context),
                                         child: Text("Submit"),
+
+
                                       ),
                                     ],
                                   ),
@@ -172,8 +188,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         },
                         child: Text("Send OTP"),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.yellow,
-                          foregroundColor: Colors.black,
+                          backgroundColor: Color(0xFFF28920),
+                          foregroundColor: const Color.fromARGB(255, 255, 255, 255),
                         ),
                       ),
                     ),

@@ -3,10 +3,11 @@ import 'package:animations/animations.dart';
 import 'package:pelaporan_bencana/petugas_bencana_app/autentifikasi/login_screen.dart';
 import 'package:pelaporan_bencana/petugas_bencana_app/pelaporan_bencana_app_home_screen.dart';
 
+// ini perubahan
+
 class CenterNextButton extends StatelessWidget {
   final AnimationController animationController;
   final VoidCallback onNextClick;
-
   const CenterNextButton({
     Key? key,
     required this.animationController,
@@ -34,18 +35,6 @@ class CenterNextButton extends StatelessWidget {
       parent: animationController,
       curve: Interval(
         0.6,
-        0.8,
-        curve: Curves.fastOutSlowIn,
-      ),
-    ));
-
-    final _signUpByPhoneMoveAnimation = Tween<double>(
-      begin: 0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: animationController,
-      curve: Interval(
-        0.7, // Muncul setelah animasi mencapai sekitar 70% kemajuan
         0.8,
         curve: Curves.fastOutSlowIn,
       ),
@@ -93,71 +82,77 @@ class CenterNextButton extends StatelessWidget {
                 padding: EdgeInsets.only(
                   bottom: 38 - (38 * _signUpMoveAnimation.value),
                 ),
-                child: Column(
-                  children: [
-                    Container(
-                      height: 58,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                          32 * (1 - _signUpMoveAnimation.value),
-                        ),
-                        color: Color(0xFFF28920),
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LoginPage(),
-                            ),
-                          );
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Text(
-                            'Sign Up',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
+                child: Container(
+                  height: 58,
+                  width: 58 + (200 * _signUpMoveAnimation.value),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(
+                      8 + 32 * (1 - _signUpMoveAnimation.value),
                     ),
-                    SizedBox(height: 16), // Add spacing
-                    AnimatedOpacity(
-                      opacity: _signUpByPhoneMoveAnimation.value,
-                      duration: Duration(milliseconds: 480),
-                      child: Container(
-                        height: 58,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                            32 * (1 - _signUpMoveAnimation.value),
+                    color: Color(0xFFF28920),
+                  ),
+                  child: PageTransitionSwitcher(
+                    duration: Duration(milliseconds: 480),
+                    reverse: _signUpMoveAnimation.value < 0.7,
+                    transitionBuilder: (
+                        Widget child,
+                        Animation<double> animation,
+                        Animation<double> secondaryAnimation,
+                        ) {
+                      return SharedAxisTransition(
+                        fillColor: Colors.transparent,
+                        child: child,
+                        animation: animation,
+                        secondaryAnimation: secondaryAnimation,
+                        transitionType: SharedAxisTransitionType.vertical,
+                      );
+                    },
+                    child: _signUpMoveAnimation.value > 0.7
+                        ? InkWell(
+                      key: ValueKey('LoginPage'),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginPage(),
                           ),
-                          color: Color(0xFFF28920),
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            // Action when Sign Up by Phone is tapped
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Text(
-                              'Sign Up by Phone',
+                        );
+                      },
+                      child: Padding(
+                        padding:
+                        EdgeInsets.only(left: 16.0, right: 16.0),
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Sign Up',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                          ),
+                            Icon(
+                              Icons.arrow_forward_rounded,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                        : InkWell(
+                      key: ValueKey('next button'),
+                      onTap: onNextClick,
+                      child: Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: Colors.white,
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -182,7 +177,7 @@ class CenterNextButton extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => PelaporansAppHomeScreen(),
+                          builder: (context) => PelaporansAppHomeScreen(),// Ganti WelcomeScreen dengan nama kelas yang sesuai
                         ),
                       );
                     },
