@@ -227,10 +227,6 @@ class _TrainingScreenState extends State<TrainingScreen>
                                     Radius.circular(32.0)),
                                 onTap: () {},
                                 child: Center(
-                                  child: Icon(
-                                    Icons.keyboard_arrow_right,
-                                    color: PelaporansAppTheme.grey,
-                                  ),
                                 ),
                               ),
                             ),

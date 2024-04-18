@@ -51,25 +51,9 @@ class TitleView extends StatelessWidget {
                         padding: const EdgeInsets.only(left: 8),
                         child: Row(
                           children: <Widget>[
-                            Text(
-                              subTxt,
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                fontFamily: PelaporansAppTheme.fontName,
-                                fontWeight: FontWeight.normal,
-                                fontSize: 16,
-                                letterSpacing: 0.5,
-                                color: PelaporansAppTheme.nearlyDarkBlue,
-                              ),
-                            ),
                             SizedBox(
                               height: 38,
                               width: 26,
-                              child: Icon(
-                                Icons.arrow_forward,
-                                color: PelaporansAppTheme.darkText,
-                                size: 18,
-                              ),
                             ),
                           ],
                         ),

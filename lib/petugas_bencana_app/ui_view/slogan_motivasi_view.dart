@@ -69,7 +69,7 @@ class RunningView extends StatelessWidget {
                                           top: 16,
                                         ),
                                         child: Text(
-                                          "Ayo bantu kami dalam pelaporan bencana!",
+                                          "Ayo bantu kami dalam pelaporan!",
                                           textAlign: TextAlign.left,
                                           style: TextStyle(
                                             fontFamily:
