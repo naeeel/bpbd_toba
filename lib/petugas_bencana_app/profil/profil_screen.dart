@@ -1,10 +1,7 @@
-import 'package:pelaporan_bencana/petugas_bencana_app/ui_view/foto_pengurus_view.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/ui_view/slogan_motivasi_view.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/ui_view/title_view.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/ui_view/profil_anda_view.dart';
 import 'package:flutter/material.dart';
-
-import '../pelaporan_bencana_app_theme.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pelaporan_bencana/petugas_bencana_app/profil/report_history_screen.dart';
 
 class TrainingScreen extends StatefulWidget {
   const TrainingScreen({Key? key, this.animationController}) : super(key: key);
@@ -14,233 +11,155 @@ class TrainingScreen extends StatefulWidget {
   _TrainingScreenState createState() => _TrainingScreenState();
 }
 
-class _TrainingScreenState extends State<TrainingScreen>
-    with TickerProviderStateMixin {
-  Animation<double>? topBarAnimation;
+class _TrainingScreenState extends State<TrainingScreen> {
+  late String _firstName = '';
+  late String _lastName = '';
+  late String _email = '';
+  late List<Report> _userReports = []; // Menyimpan laporan pengguna
 
-  List<Widget> listViews = <Widget>[];
-  final ScrollController scrollController = ScrollController();
-  double topBarOpacity = 0.0;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
-    topBarAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(
-            parent: widget.animationController!,
-            curve: Interval(0, 0.5, curve: Curves.fastOutSlowIn)));
-    addAllListData();
+    super.initState();
+    _getUserData();
+    _getUserReports(); // Panggil fungsi untuk mengambil laporan pengguna
+  }
 
-    scrollController.addListener(() {
-      if (scrollController.offset >= 24) {
-        if (topBarOpacity != 1.0) {
+  Future<void> _getUserData() async {
+    try {
+      User? user = _auth.currentUser;
+
+      if (user != null) {
+        String userId = user.uid;
+
+        DocumentSnapshot documentSnapshot =
+        await _firestore.collection('users').doc(userId).get();
+
+        if (documentSnapshot.exists) {
           setState(() {
-            topBarOpacity = 1.0;
+            _firstName = documentSnapshot.get('firstName') ?? '';
+            _lastName = documentSnapshot.get('lastName') ?? '';
+            _email = documentSnapshot.get('email') ?? '';
           });
-        }
-      } else if (scrollController.offset <= 24 &&
-          scrollController.offset >= 0) {
-        if (topBarOpacity != scrollController.offset / 24) {
-          setState(() {
-            topBarOpacity = scrollController.offset / 24;
-          });
-        }
-      } else if (scrollController.offset <= 0) {
-        if (topBarOpacity != 0.0) {
-          setState(() {
-            topBarOpacity = 0.0;
-          });
+        } else {
+          print('Document does not exist');
         }
       }
-    });
-    super.initState();
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
   }
 
-  void addAllListData() {
-    const int count = 5;
+  Future<void> _getUserReports() async {
+    try {
+      User? user = _auth.currentUser;
 
-    listViews.add(
-      TitleView(
-        titleTxt: 'Profil',
-        animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-            parent: widget.animationController!,
-            curve:
-                Interval((1 / count) * 0, 1.0, curve: Curves.fastOutSlowIn))),
-        animationController: widget.animationController!,
-      ),
-    );
+      if (user != null) {
+        String userId = user.uid;
 
-    listViews.add(
-      WorkoutView(
-        animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-            parent: widget.animationController!,
-            curve:
-                Interval((1 / count) * 2, 1.0, curve: Curves.fastOutSlowIn))),
-        animationController: widget.animationController!,
-      ),
-    );
-    listViews.add(
-      RunningView(
-        animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-            parent: widget.animationController!,
-            curve:
-                Interval((1 / count) * 3, 1.0, curve: Curves.fastOutSlowIn))),
-        animationController: widget.animationController!,
-      ),
-    );
+        QuerySnapshot querySnapshot = await _firestore
+            .collection('laporan')
+            .where('userId', isEqualTo: userId)
+            .orderBy('timestamp', descending: true)
+            .get();
 
-    listViews.add(
-      TitleView(
-        titleTxt: 'Pengurus BNPB',
-        animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-            parent: widget.animationController!,
-            curve:
-                Interval((1 / count) * 4, 1.0, curve: Curves.fastOutSlowIn))),
-        animationController: widget.animationController!,
-      ),
-    );
+        List<Report> reports = querySnapshot.docs
+            .map((doc) => Report.fromSnapshot(doc))
+            .toList();
 
-    listViews.add(
-      AreaListView(
-        mainScreenAnimation: Tween<double>(begin: 0.0, end: 1.0).animate(
-            CurvedAnimation(
-                parent: widget.animationController!,
-                curve: Interval((1 / count) * 5, 1.0,
-                    curve: Curves.fastOutSlowIn))),
-        mainScreenAnimationController: widget.animationController!,
-      ),
-    );
-  }
-
-  Future<bool> getData() async {
-    await Future<dynamic>.delayed(const Duration(milliseconds: 50));
-    return true;
+        setState(() {
+          _userReports = reports;
+        });
+      }
+    } catch (e) {
+      print('Error fetching user reports: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: PelaporansAppTheme.background,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Stack(
-          children: <Widget>[
-            getMainListViewUI(),
-            getAppBarUI(),
-            SizedBox(
-              height: MediaQuery.of(context).padding.bottom,
-            )
-          ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Profile'),
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 60,
+                backgroundImage: AssetImage('assets/images/profile_picture.jpg'),
+              ),
+              SizedBox(height: 16),
+              Text(
+                '$_firstName $_lastName',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                _email,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+              SizedBox(height: 32),
+              ListTile(
+                leading: Icon(Icons.person),
+                title: Text('Profile'),
+                onTap: () {
+                  // Handle Profile tap
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.history),
+                title: Text('Historis Pelaporan'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ReportHistoryScreen(userReports: _userReports),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.support),
+                title: Text('Tentang Kami'),
+                onTap: () {
+                  // Handle Support Center tap
+                },
+              ),
+              SizedBox(height: 32),
+              TextButton(
+                onPressed: () {
+                  // Add logout button functionality
+                },
+                child: ListTile(
+                  leading: Icon(Icons.logout, color: Colors.red), // Mengubah warna ikon
+                  title: Text('Log Out', style: TextStyle(color: Colors.red)), // Mengubah warna teks
+                ),
+              ),
+              SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );
   }
+}
 
-  Widget getMainListViewUI() {
-    return FutureBuilder<bool>(
-      future: getData(),
-      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-        if (!snapshot.hasData) {
-          return const SizedBox();
-        } else {
-          return ListView.builder(
-            controller: scrollController,
-            padding: EdgeInsets.only(
-              top: AppBar().preferredSize.height +
-                  MediaQuery.of(context).padding.top +
-                  24,
-              bottom: 62 + MediaQuery.of(context).padding.bottom,
-            ),
-            itemCount: listViews.length,
-            scrollDirection: Axis.vertical,
-            itemBuilder: (BuildContext context, int index) {
-              widget.animationController?.forward();
-              return listViews[index];
-            },
-          );
-        }
-      },
-    );
-  }
-
-  Widget getAppBarUI() {
-    return Column(
-      children: <Widget>[
-        AnimatedBuilder(
-          animation: widget.animationController!,
-          builder: (BuildContext context, Widget? child) {
-            return FadeTransition(
-              opacity: topBarAnimation!,
-              child: Transform(
-                transform: Matrix4.translationValues(
-                    0.0, 30 * (1.0 - topBarAnimation!.value), 0.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: PelaporansAppTheme.white.withOpacity(topBarOpacity),
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(32.0),
-                    ),
-                    boxShadow: <BoxShadow>[
-                      BoxShadow(
-                          color: PelaporansAppTheme.grey
-                              .withOpacity(0.4 * topBarOpacity),
-                          offset: const Offset(1.1, 1.1),
-                          blurRadius: 10.0),
-                    ],
-                  ),
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(
-                        height: MediaQuery.of(context).padding.top,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                            left: 16,
-                            right: 16,
-                            top: 16 - 8.0 * topBarOpacity,
-                            bottom: 12 - 8.0 * topBarOpacity),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  'BNPB',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    fontFamily: PelaporansAppTheme.fontName,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 22 + 6 - 6 * topBarOpacity,
-                                    letterSpacing: 1.2,
-                                    color: Color(0xFFF28920),
-                                  ),
-                                ),
-                              ),
-                            ),
-                           
-                            SizedBox(
-                              height: 38,
-                              width: 38,
-                              child: InkWell(
-                                highlightColor: Colors.transparent,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(32.0)),
-                                onTap: () {},
-                                child: Center(
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        )
-      ],
-    );
-  }
+void main() {
+  runApp(MaterialApp(
+    home: TrainingScreen(),
+  ));
 }

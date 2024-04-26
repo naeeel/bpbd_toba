@@ -1,22 +1,26 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pelaporan_bencana/petugas_bencana_app/Lapor/location_picker_map.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' show LatLng;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+  await Firebase.initializeApp();
+  runApp(LaporApp());
 }
 
-class MyApp extends StatelessWidget {
+class LaporApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Laporkan Bencana',
+      title: 'Laporan Bencana',
       theme: ThemeData(
-        primarySwatch: Colors.orange,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        primarySwatch: Colors.blue,
       ),
       home: LaporPage(),
     );
@@ -157,8 +161,7 @@ class _LaporPageState extends State<LaporPage> {
 
   void _pickImage() async {
     final picker = ImagePicker();
-    final pickedFile =
-    await picker.pickImage(source: ImageSource.camera);
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
         _pickedImage = File(pickedFile.path);
@@ -181,25 +184,129 @@ class _LaporPageState extends State<LaporPage> {
     }
   }
 
-  void _submitReport(BuildContext context) {
+  Future<void> _submitReport(BuildContext context) async {
     if (_pickedImage == null ||
         _selectedLocation == null ||
         _keteranganController.text.isEmpty) {
-      // Tampilkan pesan kesalahan jika ada field yang kosong
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Harap lengkapi semua informasi.'),
       ));
       return;
     }
 
-    // Simpan laporan ke database (dalam contoh ini, laporan tidak disimpan ke database)
+    try {
+      // Get a reference to the Firebase Storage
+      final storage = FirebaseStorage.instance;
 
-    // Tampilkan pesan sukses
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Laporan berhasil dikirim.'),
-    ));
-    setState(() {
-      _isDataSent = true;
-    });
+      // Create a reference to the image file
+      final ref = storage.ref().child('images/${DateTime.now()}.jpg');
+
+      // Upload image to Firebase Storage
+      final uploadTask = ref.putFile(_pickedImage!);
+      final snapshot = await uploadTask.whenComplete(() {});
+
+      // Get download URL
+      final imageURL = await snapshot.ref.getDownloadURL();
+
+      // Get a reference to the Firestore collection
+      CollectionReference reportsRef = FirebaseFirestore.instance.collection('laporan');
+
+      // Get current user ID
+      String userId = FirebaseAuth.instance.currentUser!.uid;
+
+      // Misalnya, inisialisasi status sebagai 'sent' saat membuat laporan baru
+      ReportStatus status = ReportStatus.sent;
+
+      // Create a new document with a unique ID
+      await reportsRef.add({
+        'userId': userId, // Add user ID to the report data
+        'disasterType': _selectedDisasterType,
+        'imagePath': imageURL, // Add imageURL to the document
+        'latitude': _selectedLocation!.latitude,
+        'longitude': _selectedLocation!.longitude,
+        'keterangan': _keteranganController.text,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+        'status': status.toString(), // Add status to the document
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Laporan berhasil dikirim.'),
+      ));
+      setState(() {
+        _isDataSent = true;
+      });
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Gagal mengirim laporan: $error'),
+      ));
+    }
+  }
+}
+
+enum ReportStatus { sent, inProgress, completed, rejected }
+
+class Report {
+  final String id;
+  final String userId;
+  final String disasterType;
+  final String imagePath; // Field imagePath untuk menyimpan URL gambar
+  final double latitude;
+  final double longitude;
+  final String keterangan;
+  final int timestamp;
+  final ReportStatus status;
+
+  Report({
+    required this.id,
+    required this.userId,
+    required this.disasterType,
+    required this.imagePath,
+    required this.latitude,
+    required this.longitude,
+    required this.keterangan,
+    required this.timestamp,
+    required this.status,
+  });
+
+  factory Report.fromSnapshot(DocumentSnapshot snapshot) {
+    return Report(
+      id: snapshot.id,
+      userId: snapshot['userId'] ?? '',
+      disasterType: snapshot['disasterType'] ?? '',
+      imagePath: snapshot['imagePath'] ?? '', // Mengambil imagePath dari Firestore
+      latitude: (snapshot['latitude'] ?? 0.0) as double,
+      longitude: (snapshot['longitude'] ?? 0.0) as double,
+      keterangan: snapshot['keterangan'] ?? '',
+      timestamp: (snapshot['timestamp'] ?? 0) as int,
+      status: _getStatusFromString(snapshot['status'] ?? ''),
+    );
+  }
+
+  static ReportStatus _getStatusFromString(String statusString) {
+    switch (statusString) {
+      case 'sent':
+        return ReportStatus.sent;
+      case 'inProgress':
+        return ReportStatus.inProgress;
+      case 'completed':
+        return ReportStatus.completed;
+      case 'rejected':
+        return ReportStatus.rejected;
+      default:
+        return ReportStatus.sent;
+    }
+  }
+
+  Icon getStatusIcon() {
+    switch (status) {
+      case ReportStatus.sent:
+        return Icon(Icons.send);
+      case ReportStatus.inProgress:
+        return Icon(Icons.hourglass_top);
+      case ReportStatus.completed:
+        return Icon(Icons.done);
+      case ReportStatus.rejected:
+        return Icon(Icons.close);
+    }
   }
 }

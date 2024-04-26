@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/autentifikasi/login_screen.dart';
+import 'package:pelaporan_bencana/petugas_bencana_app/autentifikasi/list_login_screen.dart' as ListLoginScreen;
+import 'package:pelaporan_bencana/petugas_bencana_app/autentifikasi/register_screen.dart' as RegisterScreen;
 import 'package:pelaporan_bencana/petugas_bencana_app/pelaporan_bencana_app_home_screen.dart';
-
-// ini perubahan
 
 class CenterNextButton extends StatelessWidget {
   final AnimationController animationController;
@@ -114,7 +113,7 @@ class CenterNextButton extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LoginPage(),
+                            builder: (context) => ListLoginScreen.ListLoginPage(),
                           ),
                         );
                       },
@@ -126,7 +125,7 @@ class CenterNextButton extends StatelessWidget {
                           MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Sign Up',
+                              'Masuk',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -165,7 +164,7 @@ class CenterNextButton extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Already have an account? ',
+                    'Anda belum punya akun? ',
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: 14,
@@ -177,12 +176,12 @@ class CenterNextButton extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => PelaporansAppHomeScreen(),// Ganti WelcomeScreen dengan nama kelas yang sesuai
+                          builder: (context) => RegisterScreen.RegisterScreen(),// Ganti WelcomeScreen dengan nama kelas yang sesuai
                         ),
                       );
                     },
                     child: Text(
-                      'Login',
+                      'Daftar',
                       style: TextStyle(
                         color: Color(0xFFF28920),
                         fontSize: 16,
