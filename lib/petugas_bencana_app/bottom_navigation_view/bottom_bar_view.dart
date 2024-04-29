@@ -176,7 +176,7 @@ class _BottomBarViewState extends State<BottomBarView>
                             );
                           },
                           child: Image.asset(
-                            'assets/introduction_animation/logo.png',
+                            'assets/introduction_animation/logo2.png',
                               height: 32,
                               width: 32,
                           ),
