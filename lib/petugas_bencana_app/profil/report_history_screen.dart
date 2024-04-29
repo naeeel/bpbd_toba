@@ -70,10 +70,39 @@ class Report {
   }
 }
 
-class ReportHistoryScreen extends StatelessWidget {
+class ReportHistoryScreen extends StatefulWidget {
   final List<Report> userReports;
 
-  const ReportHistoryScreen({Key? key, required this.userReports}) : super(key: key);
+  const ReportHistoryScreen({Key? key, required this.userReports})
+      : super(key: key);
+
+  @override
+  _ReportHistoryScreenState createState() => _ReportHistoryScreenState();
+}
+
+class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
+  late List<Report> _userReports;
+
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+  GlobalKey<RefreshIndicatorState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _userReports = widget.userReports;
+  }
+
+  Future<void> _refreshData() async {
+    await Future.delayed(Duration(seconds: 1)); // Simulating delay
+
+    // Fetch updated data from Firestore
+    // You may need to implement logic to fetch data from Firestore again
+    // and update _userReports
+
+    setState(() {
+      // Update _userReports with new data
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,55 +110,61 @@ class ReportHistoryScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Historis Pelaporan'),
       ),
-      body: userReports.isEmpty
-          ? Center(
-        child: Text('Tidak ada laporan'),
-      )
-          : ListView.builder(
-        itemCount: userReports.length,
-        itemBuilder: (context, index) {
-          Report report = userReports[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: Card(
-              elevation: 4,
-              child: ListTile(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ReportDetailScreen(report: report),
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: _refreshData,
+        child: _userReports.isEmpty
+            ? Center(
+          child: Text('Tidak ada laporan'),
+        )
+            : ListView.builder(
+          itemCount: _userReports.length,
+          itemBuilder: (context, index) {
+            Report report = _userReports[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(
+                  vertical: 8.0, horizontal: 16.0),
+              child: Card(
+                elevation: 4,
+                child: ListTile(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ReportDetailScreen(report: report),
+                      ),
+                    );
+                  },
+                  leading: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: NetworkImage(report.imagePath),
+                      ),
                     ),
-                  );
-                },
-                leading: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: NetworkImage(report.imagePath),
+                  ),
+                  title: Text(
+                    report.disasterType,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-                title: Text(
-                  report.disasterType,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                  subtitle: Text(
+                    'Latitude: ${report.latitude}, Longitude: ${report.longitude}',
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
+                  trailing: report.getStatusIcon(),
                 ),
-                subtitle: Text(
-                  'Latitude: ${report.latitude}, Longitude: ${report.longitude}',
-                  style: TextStyle(
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-                trailing: report.getStatusIcon(),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

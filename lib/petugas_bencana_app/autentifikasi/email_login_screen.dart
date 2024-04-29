@@ -12,6 +12,7 @@ class AuthService {
       // Simpan status "Ingatkan Saya" jika ditandai
       if (rememberMe) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('email', email); // Simpan email ke SharedPreferences
         await prefs.setBool('rememberMe', true);
       }
       return "Success";
@@ -41,9 +42,15 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
   Future<void> _getRememberMeStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool rememberMe = prefs.getBool('rememberMe') ?? false;
-    setState(() {
-      _rememberMe = rememberMe;
-    });
+    if (rememberMe) {
+      String? savedEmail = prefs.getString('email');
+      if (savedEmail != null) {
+        setState(() {
+          _emailController.text = savedEmail; // Set email yang disimpan ke dalam text field
+          _rememberMe = true;
+        });
+      }
+    }
   }
 
   void _handleSubmit(BuildContext context) {
@@ -177,6 +184,17 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFFF28920),
                           foregroundColor: const Color.fromARGB(255, 255, 255, 255),
+                        ),
+                      ),
+                    ),
+                    TextButton( // Fitur tambahan untuk lupa kata sandi
+                      onPressed: () {
+                        // Implementasi logika untuk lupa kata sandi
+                      },
+                      child: Text(
+                        "Lupa Kata Sandi?",
+                        style: TextStyle(
+                          color: Colors.blue,
                         ),
                       ),
                     ),

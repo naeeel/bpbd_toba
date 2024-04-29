@@ -18,38 +18,6 @@ class _LocationPickerMapState extends State<LocationPickerMap> {
     _getCurrentLocation();
   }
 
-  void _getCurrentLocation() async {
-    // Memeriksa dan meminta izin
-    var status = await Permission.location.request();
-
-    if (status == PermissionStatus.granted) {
-      try {
-        final Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high,
-        );
-        setState(() {
-          _selectedLocation = LatLng(position.latitude, position.longitude);
-        });
-
-        // Pusatkan peta ke lokasi pengguna saat ini
-        _mapController.animateCamera(
-          CameraUpdate.newLatLng(_selectedLocation!),
-        );
-      } catch (e) {
-        print("Error getting location: $e");
-      }
-    } else {
-      // Izin tidak diberikan
-      print('Location permission denied.');
-    }
-  }
-
-  void _sendLocationToReport() {
-    if (_selectedLocation != null) {
-      Navigator.pop(context, _selectedLocation); // Send back the location to the previous screen
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,17 +51,52 @@ class _LocationPickerMapState extends State<LocationPickerMap> {
         },
         onMapCreated: (GoogleMapController controller) {
           setState(() {
-            _mapController = controller;
+            _mapController = controller; // Inisialisasi _mapController di sini
           });
         },
       ),
     );
   }
 
+  // Metode untuk menangani ketika peta ditekan
   void _onMapTap(LatLng latLng) {
     print("Map tapped at: $latLng");
     setState(() {
       _selectedLocation = latLng;
     });
+  }
+
+  // Metode untuk menangani ketika tombol Kirim ditekan
+  void _sendLocationToReport() {
+    if (_selectedLocation != null) {
+      Navigator.pop(context, _selectedLocation); // Kirim kembali lokasi ke layar sebelumnya
+    }
+  }
+
+  // Metode untuk mendapatkan lokasi pengguna saat ini
+  void _getCurrentLocation() async {
+    // Memeriksa dan meminta izin
+    var status = await Permission.location.request();
+
+    if (status == PermissionStatus.granted) {
+      try {
+        final Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
+        setState(() {
+          _selectedLocation = LatLng(position.latitude, position.longitude);
+        });
+
+        // Pusatkan peta ke lokasi pengguna saat ini
+        _mapController.animateCamera(
+          CameraUpdate.newLatLng(_selectedLocation!),
+        );
+      } catch (e) {
+        print("Error getting location: $e");
+      }
+    } else {
+      // Izin tidak diberikan
+      print('Location permission denied.');
+    }
   }
 }

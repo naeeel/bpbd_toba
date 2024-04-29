@@ -38,6 +38,7 @@ class _LaporPageState extends State<LaporPage> {
   LatLng? _selectedLocation;
   final TextEditingController _keteranganController = TextEditingController();
   bool _isDataSent = false;
+  bool _isSending = false;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +65,7 @@ class _LaporPageState extends State<LaporPage> {
               ),
               SizedBox(height: 20),
               InkWell(
-                onTap: _pickImage,
+                onTap: _isSending ? null : _pickImage,
                 child: Container(
                   height: MediaQuery.of(context).size.height * 0.2,
                   color: Colors.grey[200],
@@ -136,14 +137,16 @@ class _LaporPageState extends State<LaporPage> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _isDataSent ? null : () => _submitReport(context),
+                onPressed: _isDataSent || _isSending ? null : () => _submitReport(context),
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all<Color>(
-                      _isDataSent ? Colors.grey : Colors.orange),
+                      _isDataSent || _isSending ? Colors.grey : Colors.orange),
                   minimumSize: MaterialStateProperty.all<Size>(
                       Size(double.infinity, 50)),
                 ),
-                child: Text('Laporkan'),
+                child: _isSending
+                    ? CircularProgressIndicator()
+                    : Text('Laporkan'),
               ),
               SizedBox(height: 10),
               _isDataSent
@@ -194,6 +197,10 @@ class _LaporPageState extends State<LaporPage> {
       return;
     }
 
+    setState(() {
+      _isSending = true;
+    });
+
     try {
       // Get a reference to the Firebase Storage
       final storage = FirebaseStorage.instance;
@@ -209,7 +216,8 @@ class _LaporPageState extends State<LaporPage> {
       final imageURL = await snapshot.ref.getDownloadURL();
 
       // Get a reference to the Firestore collection
-      CollectionReference reportsRef = FirebaseFirestore.instance.collection('laporan');
+      CollectionReference reportsRef =
+      FirebaseFirestore.instance.collection('laporan');
 
       // Get current user ID
       String userId = FirebaseAuth.instance.currentUser!.uid;
@@ -239,6 +247,10 @@ class _LaporPageState extends State<LaporPage> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Gagal mengirim laporan: $error'),
       ));
+    } finally {
+      setState(() {
+        _isSending = false;
+      });
     }
   }
 }
