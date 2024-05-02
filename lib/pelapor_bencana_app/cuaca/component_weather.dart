@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:lottie/lottie.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/cuaca/weather_model.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/cuaca/weather_model.dart';
 
 class WeatherInfo extends StatelessWidget {
   final IconData icon;

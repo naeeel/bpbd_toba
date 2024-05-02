@@ -1,4 +1,4 @@
-import 'package:pelaporan_bencana/petugas_bencana_app/ui_view/title_view.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/ui_view/title_view.dart';
 import 'package:flutter/material.dart';
 
 import '../pelaporan_bencana_app_theme.dart';

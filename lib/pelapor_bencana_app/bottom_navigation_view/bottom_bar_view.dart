@@ -1,7 +1,7 @@
 import 'dart:math' as math;
-import 'package:pelaporan_bencana/petugas_bencana_app/Lapor/laporkan.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/pelaporan_bencana_app_theme.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/models/tabIcon_data.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/Lapor/laporkan.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_theme.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/models/tabIcon_data.dart';
 import 'package:pelaporan_bencana/main.dart';
 import 'package:flutter/material.dart';
 

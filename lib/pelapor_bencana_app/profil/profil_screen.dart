@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/profil/report_history_screen.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/profil/report_history_screen.dart';
 
 class TrainingScreen extends StatefulWidget {
   const TrainingScreen({Key? key, this.animationController}) : super(key: key);

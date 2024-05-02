@@ -2,7 +2,7 @@
 import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:pelaporan_bencana/petugas_bencana_app/cuaca/weather_model.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/cuaca/weather_model.dart';
 import 'package:geocoding/geocoding.dart';
 
 class WeatherService {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/autentifikasi/email_login_screen.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/autentifikasi/phone_login_screen.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/autentifikasi/email_login_screen.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/autentifikasi/phone_login_screen.dart';
 
 class ListLoginPage extends StatelessWidget {
   void handleEmailLogin(BuildContext context) {

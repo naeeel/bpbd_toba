@@ -1,4 +1,4 @@
-import 'package:pelaporan_bencana/petugas_bencana_app/pelaporan_bencana_app_home_screen.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_home_screen.dart';
 import 'package:pelaporan_bencana/introduction_animation/introduction_animation_screen.dart';
 import 'package:flutter/widgets.dart';
 

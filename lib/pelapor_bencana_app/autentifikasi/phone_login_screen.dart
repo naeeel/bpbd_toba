@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/controllers/auth_service.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/pelaporan_bencana_app_home_screen.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/controllers/auth_service.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -70,7 +70,7 @@ class _LoginPageState extends State<PhoneLoginPage>
   Future<bool> isPhoneNumberRegistered(String phoneNumber) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('users')
-        .where('phone', isEqualTo: phoneNumber)
+        .where('phone', isEqualTo: phoneNumber.replaceAll("+62 ", ""))
         .get();
 
     return querySnapshot.docs.isNotEmpty;
@@ -151,11 +151,11 @@ class _LoginPageState extends State<PhoneLoginPage>
                           ),
                         ),
                         validator: (value) {
-                          if (value!.isEmpty || !value.startsWith("+62 ")) {
-                            return "masukkan nomor telepon anda dengan benar";
+                          if (value == null || value.isEmpty) {
+                            return "Masukkan nomor telepon anda dengan benar";
                           }
-                          if (value.length < 13 || value.length > 15) {
-                            return "Invalid phone number";
+                          if (value.length < 11 || value.length > 15) {
+                            return "Nomor telepon tidak valid";
                           }
                           return null;
                         },

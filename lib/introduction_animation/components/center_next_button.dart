@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/autentifikasi/list_login_screen.dart' as ListLoginScreen;
-import 'package:pelaporan_bencana/petugas_bencana_app/autentifikasi/register_screen.dart' as RegisterScreen;
-import 'package:pelaporan_bencana/petugas_bencana_app/pelaporan_bencana_app_home_screen.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/autentifikasi/list_login_screen.dart' as ListLoginScreen;
+import 'package:pelaporan_bencana/pelapor_bencana_app/autentifikasi/register_screen.dart' as RegisterScreen;
+import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_home_screen.dart';
 
 class CenterNextButton extends StatelessWidget {
   final AnimationController animationController;

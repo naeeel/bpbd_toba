@@ -1,8 +1,8 @@
-import 'package:pelaporan_bencana/petugas_bencana_app/beranda/laporan_masyarakat_view.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/beranda/bencana_terkini_view.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/beranda/title_view.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/pelaporan_bencana_app_theme.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/beranda/mitigasi_list_view.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/laporan_masyarakat_view.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/bencana_terkini_view.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/title_view.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_theme.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/mitigasi_list_view.dart';
 import 'package:flutter/material.dart';
 class MyDiaryScreen extends StatefulWidget {
   const MyDiaryScreen({Key? key, this.animationController}) : super(key: key);

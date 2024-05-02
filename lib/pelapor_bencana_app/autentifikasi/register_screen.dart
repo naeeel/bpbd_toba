@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/autentifikasi/list_login_screen.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/autentifikasi/list_login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,8 +30,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   TextEditingController _confirmPasswordController = TextEditingController();
 
   bool _agreeToTerms = false;
-  bool _obscurePassword = true; // For toggling password visibility
-  bool _obscureConfirmPassword = true; // For toggling confirm password visibility
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +40,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       appBar: AppBar(
         title: Text('Daftar'),
       ),
-      body: ListView(
-        padding: EdgeInsets.all(20),
-        children: [
-          Column(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               SizedBox(height: 20),
@@ -57,12 +58,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    TextFormField(
+                    _buildTextFormField(
                       controller: _firstNameController,
-                      decoration: InputDecoration(
-                        labelText: 'Nama Depan',
-                        prefixIcon: Icon(Icons.person),
-                      ),
+                      labelText: 'Nama Depan',
+                      prefixIcon: Icons.person,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Nama Depan diperlukan';
@@ -71,12 +70,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       },
                     ),
                     SizedBox(height: 10),
-                    TextFormField(
+                    _buildTextFormField(
                       controller: _lastNameController,
-                      decoration: InputDecoration(
-                        labelText: 'Nama Belakang',
-                        prefixIcon: Icon(Icons.person),
-                      ),
+                      labelText: 'Nama Belakang',
+                      prefixIcon: Icons.person,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Nama Belakang diperlukan';
@@ -85,14 +82,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       },
                     ),
                     SizedBox(height: 10),
-                    TextFormField(
+                    _buildTextFormField(
                       controller: _nikController,
-                      decoration: InputDecoration(
-                        labelText: 'NIK',
-                        prefixIcon: Icon(Icons.account_box),
-                      ),
+                      labelText: 'NIK',
+                      prefixIcon: Icons.account_box,
                       keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
+                      inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly
                       ],
                       validator: (value) {
@@ -104,12 +99,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       },
                     ),
                     SizedBox(height: 10),
-                    TextFormField(
+                    _buildTextFormField(
                       controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: 'E-Mail',
-                        prefixIcon: Icon(Icons.email),
-                      ),
+                      labelText: 'E-Mail',
+                      prefixIcon: Icons.email,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'E-Mail diperlukan';
@@ -122,45 +115,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       },
                     ),
                     SizedBox(height: 10),
-                    TextFormField(
+                    _buildTextFormField(
                       controller: _phoneController,
+                      labelText: 'Nomor Telepon',
+                      prefixText: '+62 ', // Added prefix text
+                      prefixIcon: Icons.phone,
                       keyboardType: TextInputType.phone,
-                      decoration: InputDecoration(
-                        labelText: 'Nomor Telepon',
-                        prefixIcon: Icon(Icons.phone),
-                      ),
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.digitsOnly,
-                        LengthLimitingTextInputFormatter(13), // Limiting input to 15 characters
-                      ],
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Nomor Telepon diperlukan';
+                        // Menghapus prefiks "+62 " sebelum melakukan validasi
+                        String phoneNumber = value!.replaceAll("+62 ", "");
+                        if (phoneNumber.isEmpty) {
+                          return "Masukkan nomor telepon anda dengan benar";
                         }
-                        if (value.length < 10 || value.length > 15) {
-                          return 'Nomor telepon tidak sesuai';
+                        if (phoneNumber.length < 11 || phoneNumber.length > 15) {
+                          return "Nomor telepon tidak valid";
                         }
                         return null;
                       },
                     ),
                     SizedBox(height: 10),
-                    TextFormField(
+                    _buildTextFormField(
                       controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: 'Sandi',
-                        prefixIcon: Icon(Icons.lock),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
-                        ),
+                      labelText: 'Sandi',
+                      prefixIcon: Icons.lock,
+                      suffixIcon: _buildSuffixIcon(
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                        icon: _obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       obscureText: _obscurePassword,
                       validator: (value) {
@@ -174,23 +160,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       },
                     ),
                     SizedBox(height: 10),
-                    TextFormField(
+                    _buildTextFormField(
                       controller: _confirmPasswordController,
-                      decoration: InputDecoration(
-                        labelText: 'Konfirmasi Sandi',
-                        prefixIcon: Icon(Icons.lock),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureConfirmPassword
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscureConfirmPassword = !_obscureConfirmPassword;
-                            });
-                          },
-                        ),
+                      labelText: 'Konfirmasi Sandi',
+                      prefixIcon: Icons.lock,
+                      suffixIcon: _buildSuffixIcon(
+                        onPressed: () {
+                          setState(() {
+                            _obscureConfirmPassword =
+                            !_obscureConfirmPassword;
+                          });
+                        },
+                        icon: _obscureConfirmPassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       obscureText: _obscureConfirmPassword,
                       validator: (value) {
@@ -214,25 +197,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             });
                           },
                         ),
-                        Text('I agree to '),
+                        Text('Saya menyetujui '),
                         GestureDetector(
                           onTap: () {
                             // Navigate to Privacy Policy
                           },
                           child: Text(
-                            'Privacy Policy',
+                            'Kebijakan Privasi',
                             style: TextStyle(
                                 color: Colors.blue,
                                 decoration: TextDecoration.underline),
                           ),
                         ),
-                        Text(' and '),
+                        Text(' dan '),
                         GestureDetector(
                           onTap: () {
                             // Navigate to Terms of Use
                           },
                           child: Text(
-                            'Terms of Use',
+                            'Syarat Penggunaan',
                             style: TextStyle(
                                 color: Colors.blue,
                                 decoration: TextDecoration.underline),
@@ -242,62 +225,116 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          if (_passwordController.text !=
-                              _confirmPasswordController.text) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('Konfirmasi Kata Sandi tidak cocok'),
-                            ));
-                          } else if (!_agreeToTerms) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('Anda harus menyetujui Syarat dan Ketentuan'),
-                            ));
-                          } else {
-                            try {
-                              // Mendaftarkan pengguna dengan email dan password
-                              UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                                email: _emailController.text,
-                                password: _passwordController.text,
-                              );
-
-                              // Simpan data pengguna ke Firestore
-                              await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
-                                'firstName': _firstNameController.text,
-                                'lastName': _lastNameController.text,
-                                'nik': _nikController.text,
-                                'email': _emailController.text,
-                                'phone': _phoneController.text,
-                              });
-
-                              // Navigasi ke halaman ListLoginPage setelah pendaftaran berhasil
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ListLoginPage(),
-                                ),
-                              );
-
-                              // Tampilkan pesan sukses atau navigasi ke layar lain jika perlu
-                            } catch (e) {
-                              print('Error registering user: $e');
-                              // Tampilkan pesan error jika pendaftaran gagal
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text('Terjadi kesalahan, silakan coba lagi nanti'),
-                              ));
-                            }
-                          }
-                        }
-                      },
-                      child: Text('Buat Akun'),
+                      onPressed: _isLoading ? null : _register,
+                      child: _isLoading
+                          ? CircularProgressIndicator()
+                          : Text('Buat Akun'),
                     ),
                   ],
                 ),
               ),
             ],
           ),
-        ],
+        ),
       ),
+    );
+  }
+
+  void _register() async {
+    if (_formKey.currentState!.validate()) {
+      if (_passwordController.text != _confirmPasswordController.text) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Konfirmasi Kata Sandi tidak cocok'),
+        ));
+      } else if (!_agreeToTerms) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Anda harus menyetujui Syarat dan Ketentuan'),
+        ));
+      } else {
+        setState(() {
+          _isLoading = true;
+        });
+        try {
+          UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: _emailController.text,
+            password: _passwordController.text,
+          );
+
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userCredential.user!.uid)
+              .set({
+            'firstName': _firstNameController.text,
+            'lastName': _lastNameController.text,
+            'nik': _nikController.text,
+            'email': _emailController.text,
+            'phone': _phoneController.text.replaceAll("+62 ", ""), // Removed prefix text
+          });
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ListLoginPage(),
+            ),
+          );
+        } catch (e) {
+          print('Error registering user: $e');
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content:
+            Text('Terjadi kesalahan, silakan coba lagi nanti'),
+          ));
+        } finally {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
+  }
+
+  Widget _buildTextFormField({
+    required TextEditingController controller,
+    required String labelText,
+    required IconData prefixIcon,
+    Widget? suffixIcon, // Changed the type to Widget?
+    TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
+    String? prefixText,
+    required String? Function(String?) validator,
+    bool obscureText = false,
+    void Function()? onSuffixIconPressed,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        prefixIcon: Icon(prefixIcon),
+        suffixIcon: suffixIcon != null
+            ? IconButton(
+          icon: suffixIcon,
+          onPressed: onSuffixIconPressed,
+        )
+            : null,
+        prefixText: prefixText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
+      validator: validator,
+      obscureText: obscureText,
+    );
+  }
+
+  Widget _buildSuffixIcon({
+    required VoidCallback onPressed,
+    required IconData icon,
+  }) {
+    return IconButton(
+      icon: Icon(icon),
+      onPressed: onPressed,
     );
   }
 }
