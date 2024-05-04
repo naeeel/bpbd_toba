@@ -149,7 +149,7 @@ class _BottomBarViewState extends State<BottomBarView>
                         color: PelaporansAppTheme.nearlyDarkBlue,
                         gradient: LinearGradient(
                             colors: [
-                              PelaporansAppTheme.nearlyDarkBlue,
+                              Color.fromARGB(255, 255, 191, 71),
                               HexColor('#FFA500'),
                             ],
                             begin: Alignment.topLeft,
@@ -163,25 +163,26 @@ class _BottomBarViewState extends State<BottomBarView>
                               blurRadius: 16.0),
                         ],
                       ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          splashColor: Colors.white.withOpacity(0.1),
-                          highlightColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => LaporPage()),
-                            );
-                          },
-                          child: Image.asset(
-                            'assets/introduction_animation/logo2.png',
-                              height: 32,
-                              width: 32,
-                          ),
+                     child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        splashColor: Colors.white.withOpacity(0.1),
+                        highlightColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => LaporPage()),
+                          );
+                        },
+                        child: Icon(
+                          Icons.report,
+                          color: Colors.white,
+                          size: 32,
                         ),
                       ),
+                    ),
+
                     ),
                   ),
                 ),

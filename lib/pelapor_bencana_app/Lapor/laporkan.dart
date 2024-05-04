@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/Lapor/location_picker_map.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' show LatLng;
 
@@ -20,7 +21,15 @@ class LaporApp extends StatelessWidget {
     return MaterialApp(
       title: 'Laporan Bencana',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        // Modern theme with a dark blue primary color
+        primaryColor: Colors.blue[800],
+        scaffoldBackgroundColor: Colors.grey[100],
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          secondary: Colors.orange,
+        ),
+        appBarTheme: AppBarTheme(
+          color: Colors.blue[800],
+        ),
       ),
       home: LaporPage(),
     );
@@ -48,19 +57,19 @@ class _LaporPageState extends State<LaporPage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(30.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
                 'Laporkan Kejadian',
-                style: TextStyle(fontSize: 25),
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold ,fontFamily: 'roboto'),
                 textAlign: TextAlign.left,
               ),
               SizedBox(height: 10),
               Text(
                 'Bencana',
-                style: TextStyle(fontSize: 25, color: Colors.orange),
+                style: TextStyle(fontSize: 25, color: Colors.orange, fontWeight: FontWeight.bold, fontFamily: 'roboto'),
                 textAlign: TextAlign.left,
               ),
               SizedBox(height: 20),
@@ -68,192 +77,308 @@ class _LaporPageState extends State<LaporPage> {
                 onTap: _isSending ? null : _pickImage,
                 child: Container(
                   height: MediaQuery.of(context).size.height * 0.2,
-                  color: Colors.grey[200],
+                  decoration: BoxDecoration(
+                    color: Colors.white, // Warna putih
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.10), 
+                        spreadRadius: 6,
+                        blurRadius: 3,
+                        offset: Offset(0, 2), 
+                      ),
+                    ],
+                  ),
                   child: Center(
-                    child: _pickedImage != null
-                        ? Image.file(_pickedImage!)
-                        : Text('Foto', style: TextStyle(fontSize: 20)),
+                  child: _pickedImage != null
+                    ? Image.file(_pickedImage!)
+                    : Icon(Icons.camera_alt, size: 40, color: Colors.grey), 
+                ),
+
+                ),
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                child: Text(
+                  'Masukkan Keterangan',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Roboto'),
+                  textAlign: TextAlign.left,
+                ),
+              ),
+
+              SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () => _showDisasterPicker(context),
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.white, 
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                        color: Colors.grey.withOpacity(0.10), 
+                        spreadRadius: 6,
+                        blurRadius: 3,
+                        offset: Offset(0, 2), 
+                      ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        _selectedDisasterType,
+                        style: TextStyle(fontSize: 15, fontFamily: 'Roboto'),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Masukkan Keterangan',
-                style: TextStyle(fontSize: 20),
-                textAlign: TextAlign.left,
-              ),
-              SizedBox(height: 10),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: 'Jenis Bencana',
-                  border: OutlineInputBorder(),
-                ),
-                value: _selectedDisasterType,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedDisasterType = value!;
-                  });
-                },
-                items: <String>[
-                  'Gempa Bumi',
-                  'Banjir',
-                  'Kebakaran',
-                  'Tanah Longsor',
-                  'Gunung Merapi',
-                  'Angin Topan',
-                  'Tsunami',
-                  'Opsi Lainnya'
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Lokasi Bencana',
-                  border: OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.location_on),
-                    onPressed: () => _pickLocation(context),
-                  ),
-                ),
-                readOnly: true,
-                controller: TextEditingController(
-                    text: _selectedLocation != null
-                        ? "Lat: ${_selectedLocation!.latitude}, Lng: ${_selectedLocation!.longitude}"
-                        : null),
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: _keteranganController,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  labelText: 'Keterangan Bencana',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _isDataSent || _isSending ? null : () => _submitReport(context),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      _isDataSent || _isSending ? Colors.grey : Colors.orange),
-                  minimumSize: MaterialStateProperty.all<Size>(
-                      Size(double.infinity, 50)),
-                ),
-                child: _isSending
-                    ? CircularProgressIndicator()
-                    : Text('Laporkan'),
-              ),
-              SizedBox(height: 10),
-              _isDataSent
-                  ? Text(
-                'Data sudah terkirim!',
-                style: TextStyle(color: Colors.green),
-              )
-                  : SizedBox(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
-  void _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      setState(() {
-        _pickedImage = File(pickedFile.path);
-      });
-    }
-  }
+                  SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: () => _pickLocation(context),
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white, 
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                           BoxShadow(
+                              color: Colors.grey.withOpacity(0.10), 
+                              spreadRadius: 6,
+                              blurRadius: 3,
+                              offset: Offset(0, 2), 
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Posisikan item secara merata di sepanjang row
+                          children: [
+                            Expanded(
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                  child: Text(
+                                    _selectedLocation != null
+                                        ? "Lat: ${_selectedLocation!.latitude}, Lng: ${_selectedLocation!.longitude}"
+                                        : "Lokasi Bencana",
+                                    style: TextStyle(fontSize: 15,  fontFamily: 'Roboto'),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white, 
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                            color: Colors.grey.withOpacity(0.10), 
+                            spreadRadius: 6,
+                            blurRadius: 3,
+                            offset: Offset(0, 2), 
+                          ),
+                          ],
+                        ),
+                        child: TextFormField(
+                          controller: _keteranganController,
+                          maxLines: 3,
+                          decoration: InputDecoration(
+                            labelText: 'Keterangan Bencana',
+                            border: InputBorder.none, 
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0), // Padding
+                          ),
+                          style: TextStyle(fontSize: 15, fontFamily: 'Roboto'), // Ganti style teks
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: _isDataSent || _isSending ? null : () => _submitReport(context),
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                              _isDataSent || _isSending ? Colors.grey : Colors.orange),
+                            minimumSize: MaterialStateProperty.all<Size>(
+                              Size(double.infinity, 50)),
+                          ),
+                          child: _isSending
+                            ? CircularProgressIndicator()
+                            : Text(
+                                'Laporkan',
+                                style: TextStyle(
+                                  color: Colors.white, 
+                                  fontFamily: 'Roboto', 
+                                ),
+                              ),
+                        ),
 
-  Future<void> _pickLocation(BuildContext context) async {
-    LatLng? pickedLocation = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => LocationPickerMap(),
-      ),
-    );
+                              SizedBox(height: 10),
+                              _isDataSent
+                                  ? Text(
+                                      'Data sudah terkirim!',
+                                      style: TextStyle(fontFamily: 'Roboto', color: Colors.green),
+                                    )
+                                  : SizedBox(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  void _pickImage() async {
+                    final picker = ImagePicker();
+                    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+                    if (pickedFile != null) {
+                      setState(() {
+                        _pickedImage = File(pickedFile.path);
+                      });
+                    }
+                  }
+                  Future<void> _pickLocation(BuildContext context) async {
+                    LatLng? pickedLocation = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LocationPickerMap(),
+                      ),
+                    );
 
-    if (pickedLocation != null) {
-      setState(() {
-        _selectedLocation = pickedLocation;
-      });
-    }
-  }
+                    if (pickedLocation != null) {
+                      setState(() {
+                        _selectedLocation = pickedLocation;
+                      });
+                    }
+                  }
+                  Future<void> _submitReport(BuildContext context) async {
+                    if (_pickedImage == null ||
+                        _selectedLocation == null ||
+                        _keteranganController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Harap lengkapi semua informasi.',
+                            textAlign: TextAlign.center, 
+                            style: TextStyle(
+                              fontFamily: 'Roboto', 
+                            ),
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+                    setState(() {
+                      _isSending = true;
+                    });
+                    try {
+                      // Get a reference to the Firebase Storage
+                      final storage = FirebaseStorage.instance;
 
-  Future<void> _submitReport(BuildContext context) async {
-    if (_pickedImage == null ||
-        _selectedLocation == null ||
-        _keteranganController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Harap lengkapi semua informasi.'),
-      ));
-      return;
-    }
+                      // Create a reference to the image file
+                      final ref = storage.ref().child('images/${DateTime.now()}.jpg');
 
-    setState(() {
-      _isSending = true;
-    });
+                      // Upload image to Firebase Storage
+                      final uploadTask = ref.putFile(_pickedImage!);
+                      final snapshot = await uploadTask.whenComplete(() {});
 
-    try {
-      // Get a reference to the Firebase Storage
-      final storage = FirebaseStorage.instance;
+                      // Get download URL
+                      final imageURL = await snapshot.ref.getDownloadURL();
 
-      // Create a reference to the image file
-      final ref = storage.ref().child('images/${DateTime.now()}.jpg');
+                      // Get a reference to the Firestore collection
+                      CollectionReference reportsRef =
+                      FirebaseFirestore.instance.collection('laporan');
 
-      // Upload image to Firebase Storage
-      final uploadTask = ref.putFile(_pickedImage!);
-      final snapshot = await uploadTask.whenComplete(() {});
+                      // Get current user ID
+                      String userId = FirebaseAuth.instance.currentUser!.uid;
 
-      // Get download URL
-      final imageURL = await snapshot.ref.getDownloadURL();
+                      // Misalnya, inisialisasi status sebagai 'sent' saat membuat laporan baru
+                      ReportStatus status = ReportStatus.sent;
 
-      // Get a reference to the Firestore collection
-      CollectionReference reportsRef =
-      FirebaseFirestore.instance.collection('laporan');
+                      // Create a new document with a unique ID
+                      await reportsRef.add({
+                        'userId': userId, // Add user ID to the report data
+                        'disasterType': _selectedDisasterType,
+                        'imagePath': imageURL, // Add imageURL to the document
+                        'latitude': _selectedLocation!.latitude,
+                        'longitude': _selectedLocation!.longitude,
+                        'keterangan': _keteranganController.text,
+                        'timestamp': DateTime.now().millisecondsSinceEpoch,
+                        'status': status.toString(), // Add status to the document
+                      });
 
-      // Get current user ID
-      String userId = FirebaseAuth.instance.currentUser!.uid;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Laporan berhasil dikirim.',
+                            textAlign: TextAlign.center, 
+                            style: TextStyle(
+                              fontFamily: 'Roboto', 
+                            ),
+                          ),
+                        ),
+                      );
+                      setState(() {
+                        _isDataSent = true;
+                      });
+                    } catch (error) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Gagal mengirim laporan: $error',
+                            textAlign: TextAlign.center, 
+                            style: TextStyle(
+                              fontFamily: 'Roboto', 
+                            ),
+                          ),
+                        ),
+                      );
+                    } finally {
+                      setState(() {
+                        _isSending = false;
+                      });
+                    }
+                  }
 
-      // Misalnya, inisialisasi status sebagai 'sent' saat membuat laporan baru
-      ReportStatus status = ReportStatus.sent;
+                  void _showDisasterPicker(BuildContext context) {
+                    showCupertinoModalPopup(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Container(
+                          height: 200,
+                          child: CupertinoPicker(
+                            backgroundColor: Colors.white,
+                            itemExtent: 40,
+                            onSelectedItemChanged: (int index) {
+                              setState(() {
+                                _selectedDisasterType = _disasterTypes[index];
+                              });
+                            },
+                            children: _disasterTypes.map((String type) {
+                              return Center(
+                                child: Text(
+                                  type,
+                                    style: TextStyle(fontSize: 15,  fontFamily: 'Roboto'),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        );
+                      },
+                    );
+                  }
 
-      // Create a new document with a unique ID
-      await reportsRef.add({
-        'userId': userId, // Add user ID to the report data
-        'disasterType': _selectedDisasterType,
-        'imagePath': imageURL, // Add imageURL to the document
-        'latitude': _selectedLocation!.latitude,
-        'longitude': _selectedLocation!.longitude,
-        'keterangan': _keteranganController.text,
-        'timestamp': DateTime.now().millisecondsSinceEpoch,
-        'status': status.toString(), // Add status to the document
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Laporan berhasil dikirim.'),
-      ));
-      setState(() {
-        _isDataSent = true;
-      });
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Gagal mengirim laporan: $error'),
-      ));
-    } finally {
-      setState(() {
-        _isSending = false;
-      });
-    }
-  }
-}
+                  final List<String> _disasterTypes = [
+                    'Gempa Bumi',
+                    'Banjir',
+                    'Kebakaran',
+                    'Tanah Longsor',
+                    'Gunung Merapi',
+                    'Angin Topan',
+                    'Tsunami',
+                    'Opsi Lainnya'
+                  ];
+                }
 
 enum ReportStatus { sent, inProgress, completed, rejected }
 

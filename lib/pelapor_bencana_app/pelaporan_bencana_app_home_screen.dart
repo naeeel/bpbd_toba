@@ -5,7 +5,7 @@ import 'package:pelaporan_bencana/pelapor_bencana_app/profil/profil_screen.dart'
 import 'package:pelaporan_bencana/pelapor_bencana_app/bottom_navigation_view/bottom_bar_view.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_theme.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/my_diary_screen.dart';
-import 'package:pelaporan_bencana/petugas_bencana_app/mitigasi/mitigasi_screen.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/Mitigasi/mitigasi_screen.dart';
 
 class PelaporansAppHomeScreen extends StatefulWidget {
   @override

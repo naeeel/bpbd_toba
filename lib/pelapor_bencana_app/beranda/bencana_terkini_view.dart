@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_theme.dart';
+import 'package:pelaporan_bencana/main.dart';
+import 'package:flutter/material.dart';
+import 'dart:math' as math;
+
 class MediterranesnDietView extends StatelessWidget {
   final AnimationController? animationController;
   final Animation<double>? animation;
 
-  const MediterranesnDietView({Key? key, this.animationController, this.animation})
+  const MediterranesnDietView(
+      {Key? key, this.animationController, this.animation})
       : super(key: key);
 
   @override
@@ -15,114 +21,386 @@ class MediterranesnDietView extends StatelessWidget {
       builder: (BuildContext context, Widget? child) {
         return FadeTransition(
           opacity: animation!,
-          child: Transform(
-            transform: Matrix4.translationValues(0.0, 30 * (1.0 - animation!.value), 0.0),
+          child: new Transform(
+            transform: new Matrix4.translationValues(
+                0.0, 30 * (1.0 - animation!.value), 0.0),
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.only(
+                  left: 24, right: 24, top: 16, bottom: 18),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8.0),
-                  boxShadow: [
+                  color: PelaporansAppTheme.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(8.0),
+                      bottomLeft: Radius.circular(8.0),
+                      bottomRight: Radius.circular(8.0),
+                      topRight: Radius.circular(68.0)),
+                  boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      offset: Offset(1.1, 1.1),
-                      blurRadius: 10.0,
-                    ),
+                        color: PelaporansAppTheme.grey.withOpacity(0.2),
+                        offset: Offset(1.1, 1.1),
+                        blurRadius: 10.0),
                   ],
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Column(
                   children: <Widget>[
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8, right: 8, top: 4),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Stack(
-                                  clipBehavior: Clip.none,
-                                  children: <Widget>[
-                                    Container(
-                                      width: 80,
-                                      height: 80,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(100.0),
-                                        border: Border.all(
-                                          width: 4,
-                                          color: Colors.red.withOpacity(0.5),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(top: 16, left: 16, right: 16),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 8, right: 8, top: 4),
+                              child: Column(
+                                children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      Container(
+                                        height: 48,
+                                        width: 2,
+                                        decoration: BoxDecoration(
+                                          color: HexColor('#87A0E5')
+                                              .withOpacity(0.5),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(4.0)),
                                         ),
                                       ),
-                                      child: Center(
-                                        child: Text(
-                                          '${(80 * animation!.value).toInt()}%',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 20,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: -20,
-                                      right: -20,
-                                      child: CustomPaint(
-                                        painter: CurvePainter(
-                                          colors: [
-                                            Color(0xFF2633C5),
-                                            Color(0xFFe42a46),
-                                            Color(0xFFe42a46)
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 4, bottom: 2),
+                                              child: Text(
+                                                'Laporan',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      PelaporansAppTheme.fontName,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 16,
+                                                  letterSpacing: -0.1,
+                                                  color: PelaporansAppTheme.grey
+                                                      .withOpacity(0.5),
+                                                ),
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: <Widget>[
+                                            SizedBox(
+                                              width: 28,
+                                              height: 28,
+                                              child: Icon(
+                                                Icons.assignment, // Ganti dengan ikon yang sesuai seperti Icons.assignment
+                                                color: Colors.green, // Sesuaikan warna ikon dengan kebutuhan Anda
+                                              ),
+                                            ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 4, bottom: 3),
+                                                  child: Text(
+                                                    '${(107 * animation!.value).toInt()}',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          PelaporansAppTheme
+                                                              .fontName,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 16,
+                                                      color: PelaporansAppTheme
+                                                          .darkerText,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 4, bottom: 3),
+                                                  child: Text(
+                                                    'Laporan',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          PelaporansAppTheme
+                                                              .fontName,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 12,
+                                                      letterSpacing: -0.2,
+                                                      color: PelaporansAppTheme
+                                                          .grey
+                                                          .withOpacity(0.5),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            )
                                           ],
-                                          angle: 300 + (360 - 300) * (1.0 - animation!.value),
                                         ),
-                                        child: SizedBox(
-                                          width: 120,
-                                          height: 120,
+                                      )
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 8,
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Container(
+                                        height: 48,
+                                        width: 2,
+                                        decoration: BoxDecoration(
+                                          color: Colors.green.withOpacity(0.5),
+                                          borderRadius: BorderRadius.all(Radius.circular(4.0)),
                                         ),
+                                      ),
+
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 4, bottom: 2),
+                                              child: Text(
+                                                'Disetujui',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      PelaporansAppTheme.fontName,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 16,
+                                                  letterSpacing: -0.1,
+                                                  color: PelaporansAppTheme.grey
+                                                      .withOpacity(0.5),
+                                                ),
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: <Widget>[
+                                                SizedBox(
+                                                  width: 28,
+                                                  height: 28,
+                                                  child: Icon(
+                                                    Icons.check_circle, // Ganti dengan ikon yang sesuai seperti Icons.check_circle
+                                                    color: Colors.green, // Sesuaikan warna ikon dengan kebutuhan Anda
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 4, bottom: 3),
+                                                  child: Text(
+                                                    '${(102 * animation!.value).toInt()}',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          PelaporansAppTheme
+                                                              .fontName,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 16,
+                                                      color: PelaporansAppTheme
+                                                          .darkerText,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 8, bottom: 3),
+                                                  child: Text(
+                                                    'laporan',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          PelaporansAppTheme
+                                                              .fontName,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 12,
+                                                      letterSpacing: -0.2,
+                                                      color: PelaporansAppTheme
+                                                          .grey
+                                                          .withOpacity(0.5),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: Center(
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      width: 100,
+                                      height: 100,
+                                      decoration: BoxDecoration(
+                                        color: PelaporansAppTheme.white,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(100.0),
+                                        ),
+                                        border: new Border.all(
+                                          width: 4,
+                                          color: PelaporansAppTheme.nearlyDarkBlue.withOpacity(0.2),
+                                        ),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          Image.asset(
+                                            'assets/pelaporan_app/tsunami2.png', // Lokasi gambar
+                                            width: 90, // Sesuaikan ukuran gambar dengan kebutuhan Anda
+                                            height: 90,
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: CustomPaint(
+                                      painter: CurvePainter(
+                                        colors: [
+                                          PelaporansAppTheme.nearlyDarkBlue,
+                                          HexColor("#8A98E8"),
+                                          HexColor("#8A98E8"),
+                                        ],
+                                        angle: 140 + (360 - 140) * (1.0 - animation!.value),
+                                      ),
+                                      child: SizedBox(
+                                        width: 108,
+                                        height: 108,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+
+
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 24, right: 24, top: 8, bottom: 8),
+                      child: Container(
+                        height: 2,
+                        decoration: BoxDecoration(
+                          color: PelaporansAppTheme.background,
+                          borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                        ),
+                      ),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 24, right: 24, top: 8, bottom: 16),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  'Peringatan Dini',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: PelaporansAppTheme.fontName,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                    letterSpacing: -0.2,
+                                    color: PelaporansAppTheme.darkText,
+                                  ),
                                 ),
-                                SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Kebakaran Hutan',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                          color: Colors.blue,
-                                        ),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        'Kebakaran hutan terjadi di pahae dan sekitarnya, mohon untuk berhati hati dan gunakan helm.',
-                                        maxLines: 4,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 12,
-                                          color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.5),
-                                        ),
-                                      ),
-                                    ],
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Container(
+                                    height: 4,
+                                    width: 70,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          HexColor('#87A0E5').withOpacity(0),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(0)),
+                                    ),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Container(
+                                          width: ((70 / 1.2) * animation!.value),
+                                          height: 4,
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(colors: [
+                                              HexColor('#87A0E5'),
+                                              HexColor('#87A0E5')
+                                                  .withOpacity(0.5),
+                                            ]),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(4.0)),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    'Lorem ipsum, placeholder or dummy text used in typesetting and graphic design for previewing layouts. It features scrambled Latin text, which emphasizes the design over content of the layout. It is the standard placeholder text of the printing and publishing industries. Related Topics: graphic design typesetting.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: PelaporansAppTheme.fontName,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                      color:
+                                          PelaporansAppTheme.grey.withOpacity(0.5),
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                         
+                        ],
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -142,7 +420,101 @@ class CurvePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Painting logic here
+    List<Color> colorsList = [];
+    if (colors != null) {
+      colorsList = colors ?? [];
+    } else {
+      colorsList.addAll([Colors.white, Colors.white]);
+    }
+
+    final shdowPaint = new Paint()
+      ..color = Colors.black.withOpacity(0.4)
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 14;
+    final shdowPaintCenter = new Offset(size.width / 2, size.height / 2);
+    final shdowPaintRadius =
+        math.min(size.width / 2, size.height / 2) - (14 / 2);
+    canvas.drawArc(
+        new Rect.fromCircle(center: shdowPaintCenter, radius: shdowPaintRadius),
+        degreeToRadians(278),
+        degreeToRadians(360 - (365 - angle!)),
+        false,
+        shdowPaint);
+
+    shdowPaint.color = Colors.grey.withOpacity(0.3);
+    shdowPaint.strokeWidth = 16;
+    canvas.drawArc(
+        new Rect.fromCircle(center: shdowPaintCenter, radius: shdowPaintRadius),
+        degreeToRadians(278),
+        degreeToRadians(360 - (365 - angle!)),
+        false,
+        shdowPaint);
+
+    shdowPaint.color = Colors.grey.withOpacity(0.2);
+    shdowPaint.strokeWidth = 20;
+    canvas.drawArc(
+        new Rect.fromCircle(center: shdowPaintCenter, radius: shdowPaintRadius),
+        degreeToRadians(278),
+        degreeToRadians(360 - (365 - angle!)),
+        false,
+        shdowPaint);
+
+    shdowPaint.color = Colors.grey.withOpacity(0.1);
+    shdowPaint.strokeWidth = 22;
+    canvas.drawArc(
+        new Rect.fromCircle(center: shdowPaintCenter, radius: shdowPaintRadius),
+        degreeToRadians(278),
+        degreeToRadians(360 - (365 - angle!)),
+        false,
+        shdowPaint);
+
+    final rect = new Rect.fromLTWH(0.0, 0.0, size.width, size.width);
+    final gradient = new SweepGradient(
+      startAngle: degreeToRadians(268),
+      endAngle: degreeToRadians(270.0 + 360),
+      tileMode: TileMode.repeated,
+      colors: colorsList,
+    );
+    final paint = new Paint()
+      ..shader = gradient.createShader(rect)
+      ..strokeCap = StrokeCap.round // StrokeCap.round is not recommended.
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 14;
+    final center = new Offset(size.width / 2, size.height / 2);
+    final radius = math.min(size.width / 2, size.height / 2) - (14 / 2);
+
+    canvas.drawArc(
+        new Rect.fromCircle(center: center, radius: radius),
+        degreeToRadians(278),
+        degreeToRadians(360 - (365 - angle!)),
+        false,
+        paint);
+
+    final gradient1 = new SweepGradient(
+      tileMode: TileMode.repeated,
+      colors: [Colors.white, Colors.white],
+    );
+
+    var cPaint = new Paint();
+    cPaint..shader = gradient1.createShader(rect);
+    cPaint..color = Colors.white;
+    cPaint..strokeWidth = 14 / 2;
+    canvas.save();
+
+    final centerToCircle = size.width / 2;
+    canvas.save();
+
+    canvas.translate(centerToCircle, centerToCircle);
+    canvas.rotate(degreeToRadians(angle! + 2));
+
+    canvas.save();
+    canvas.translate(0.0, -centerToCircle + 14 / 2);
+    canvas.drawCircle(new Offset(0, 0), 14 / 5, cPaint);
+
+    canvas.restore();
+    canvas.restore();
+    canvas.restore();
   }
 
   @override
@@ -151,14 +523,7 @@ class CurvePainter extends CustomPainter {
   }
 
   double degreeToRadians(double degree) {
-    return (math.pi / 180) * degree;
+    var redian = (math.pi / 180) * degree;
+    return redian;
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: Scaffold(
-      body: MediterranesnDietView(),
-    ),
-  ));
 }
