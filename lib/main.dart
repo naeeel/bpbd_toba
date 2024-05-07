@@ -4,7 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:pelaporan_bencana/app_theme.dart';
-import 'introduction_animation/introduction_animation_screen.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_home_screen.dart';
+import 'package:pelaporan_bencana/introduction_animation/introduction_animation_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,10 +20,18 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown
   ]);
-  runApp(MyApp());
+
+  // Periksa apakah pengguna sudah login sebelumnya
+  bool isLoggedIn = await AuthService.isUserLoggedIn();
+
+  runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 
 class MyApp extends StatelessWidget {
+  final bool isLoggedIn;
+
+  MyApp({required this.isLoggedIn});
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -39,9 +50,34 @@ class MyApp extends StatelessWidget {
         textTheme: AppTheme.textTheme,
         platform: TargetPlatform.iOS,
       ),
-      home: IntroductionAnimationScreen(),
+      home: isLoggedIn ? PelaporansAppHomeScreen() : IntroductionAnimationScreen(),
     );
   }
+}
+
+class AuthService {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<String> signInWithEmailAndPassword({required String email, required String password, bool rememberMe = false}) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      // Simpan status login
+      if (rememberMe) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
+      }
+      return "Success";
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  // Fungsi untuk mengecek apakah pengguna sudah login sebelumnya
+  static Future<bool> isUserLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isLoggedIn') ?? false;
+  }
+
 }
 
 class HexColor extends Color {
