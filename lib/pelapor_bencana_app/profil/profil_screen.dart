@@ -218,6 +218,7 @@ class _TrainingScreenState extends State<TrainingScreen> {
       ),
     );
   }
+  
 }
 
 void main() {
