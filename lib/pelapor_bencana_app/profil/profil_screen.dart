@@ -104,12 +104,18 @@ class _TrainingScreenState extends State<TrainingScreen> {
       if (user != null) {
         String userId = user.uid;
 
+        // Upload image to Firestore storage or any other storage service
+        // and get the download URL
+        String imageURL = await uploadImageAndGetURL(imageFile);
+
+        // Update profile photo URL in Firestore with the new imageURL
         await _firestore.collection('users').doc(userId).update({
-          'photoURL': _photoURL,
+          'photoURL': imageURL,
         });
 
+        // Update _photoURL with the new imageURL
         setState(() {
-          _photoURL = _photoURL;
+          _photoURL = imageURL;
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -173,13 +179,20 @@ class _TrainingScreenState extends State<TrainingScreen> {
                 ListTile(
                   leading: Icon(Icons.edit),
                   title: Text('Edit Profile'),
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                    // Navigate to EditProfileScreen and wait for result
+                    File? newImageFile = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => EditProfileScreen(updateProfilePicture: _updateProfilePicture),
                       ),
                     );
+
+                    // If newImageFile is not null (i.e., user selected a new image)
+                    if (newImageFile != null) {
+                      // Update profile picture
+                      _updateProfilePicture(newImageFile);
+                    }
                   },
                 ),
                 ListTile(
@@ -190,7 +203,8 @@ class _TrainingScreenState extends State<TrainingScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => ReportHistoryScreen(
-                            userReports: _userReports),
+                          userReports: _userReports,
+                        ),
                       ),
                     );
                   },
@@ -218,7 +232,6 @@ class _TrainingScreenState extends State<TrainingScreen> {
       ),
     );
   }
-  
 }
 
 void main() {

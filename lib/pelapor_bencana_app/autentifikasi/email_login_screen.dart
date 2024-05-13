@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_home_screen.dart';
+import 'package:pelaporan_bencana/petugas_panel/home_design_laporan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
@@ -9,10 +11,9 @@ class AuthService {
   Future<String> signInWithEmailAndPassword({required String email, required String password, bool rememberMe = false}) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-      // Simpan status "Ingatkan Saya" jika ditandai
       if (rememberMe) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('email', email); // Simpan email ke SharedPreferences
+        await prefs.setString('email', email);
         await prefs.setBool('rememberMe', true);
       }
       return "Success";
@@ -46,11 +47,17 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
       String? savedEmail = prefs.getString('email');
       if (savedEmail != null) {
         setState(() {
-          _emailController.text = savedEmail; // Set email yang disimpan ke dalam text field
+          _emailController.text = savedEmail;
           _rememberMe = true;
         });
       }
     }
+  }
+
+  Future<bool> _isOfficer(String email) async {
+    CollectionReference officersRef = FirebaseFirestore.instance.collection('officers');
+    QuerySnapshot officersSnapshot = await officersRef.where('email', isEqualTo: email).get();
+    return officersSnapshot.docs.isNotEmpty;
   }
 
   void _handleSubmit(BuildContext context) {
@@ -58,15 +65,25 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
       AuthService().signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
-        rememberMe: _rememberMe, // Kirim status "Ingatkan Saya"
-      ).then((value) {
+        rememberMe: _rememberMe,
+      ).then((value) async {
         if (value == "Success") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PelaporansAppHomeScreen(),
-            ),
-          );
+          bool isOfficer = await _isOfficer(_emailController.text);
+          if (isOfficer) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DesignCourseHomeScreen(),
+              ),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PelaporansAppHomeScreen(),
+              ),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -187,7 +204,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                         ),
                       ),
                     ),
-                    TextButton( // Fitur tambahan untuk lupa kata sandi
+                    TextButton(
                       onPressed: () {
                         // Implementasi logika untuk lupa kata sandi
                       },
@@ -207,4 +224,10 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
       ),
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: EmailLoginPage(),
+  ));
 }

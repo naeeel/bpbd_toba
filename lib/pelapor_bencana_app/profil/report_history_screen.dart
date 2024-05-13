@@ -333,6 +333,13 @@ class _TrainingScreenState extends State<TrainingScreen> {
           'timestamp': Timestamp.now().millisecondsSinceEpoch,
           'status': status.toString(),
         });
+
+        // Menampilkan pesan umpan balik
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Laporan berhasil dibuat!'),
+          ),
+        );
       }
     } catch (e) {
       print('Error creating report: $e');
@@ -387,7 +394,8 @@ class _TrainingScreenState extends State<TrainingScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ReportHistoryScreen(userReports: _userReports),
+                    builder: (context) =>
+                        ReportHistoryScreen(userReports: _userReports),
                   ),
                 );
               },
@@ -409,5 +417,15 @@ class _TrainingScreenState extends State<TrainingScreen> {
 void main() {
   runApp(MaterialApp(
     home: TrainingScreen(),
+    theme: ThemeData(
+      primaryColor: Colors.blue, // Warna utama aplikasi
+      // backgroundColor: Colors.white, // Warna latar belakang (Deprecated)
+      colorScheme: ColorScheme.fromSwatch(
+        primarySwatch: Colors.blue, // Warna utama aplikasi
+      ).copyWith(
+        background: Colors.white, // Warna latar belakang
+      ),
+      // Tambahan tema lainnya...
+    ),
   ));
 }
