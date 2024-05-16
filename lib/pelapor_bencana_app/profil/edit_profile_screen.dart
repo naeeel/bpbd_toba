@@ -30,7 +30,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final CollectionReference _usersCollection = FirebaseFirestore.instance.collection('users');
+  final CollectionReference _membersCollection = FirebaseFirestore.instance.collection('members');
 
   final ImagePicker _picker = ImagePicker();
 
@@ -47,7 +47,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (user != null) {
         String userId = user.uid;
 
-        DocumentSnapshot documentSnapshot = await _usersCollection.doc(userId).get();
+        DocumentSnapshot documentSnapshot = await _membersCollection.doc(userId).get();
 
         if (documentSnapshot.exists) {
           setState(() {
@@ -80,7 +80,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
         String imageURL = await uploadImageAndGetURL(imageFile);
 
-        await _firestore.collection('users').doc(userId).update({
+        await _firestore.collection('members').doc(userId).update({
           'photoURL': imageURL,
         });
 
@@ -144,7 +144,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (user != null) {
         String userId = user.uid;
 
-        await _firestore.collection('users').doc(userId).update({
+        await _firestore.collection('members').doc(userId).update({
           'firstName': _firstNameController.text,
           'lastName': _lastNameController.text,
           'photoURL': _photoURL,

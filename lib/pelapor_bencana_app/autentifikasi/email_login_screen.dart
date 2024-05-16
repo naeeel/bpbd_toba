@@ -55,7 +55,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
   }
 
   Future<bool> _isOfficer(String email) async {
-    CollectionReference officersRef = FirebaseFirestore.instance.collection('officers');
+    CollectionReference officersRef = FirebaseFirestore.instance.collection('users');
     QuerySnapshot officersSnapshot = await officersRef.where('email', isEqualTo: email).get();
     return officersSnapshot.docs.isNotEmpty;
   }

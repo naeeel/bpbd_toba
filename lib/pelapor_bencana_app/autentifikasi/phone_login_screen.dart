@@ -60,7 +60,7 @@ class _LoginPageState extends State<PhoneLoginPage>
   void addPhoneNumberToDatabase(String phoneNumber) async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+      await FirebaseFirestore.instance.collection('members').doc(user.uid).set({
         'phone': phoneNumber,
       });
     }
@@ -69,7 +69,7 @@ class _LoginPageState extends State<PhoneLoginPage>
   // Function to check if the phone number is already registered
   Future<bool> isPhoneNumberRegistered(String phoneNumber) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('users')
+        .collection('members')
         .where('phone', isEqualTo: phoneNumber.replaceAll("+62 ", ""))
         .get();
 

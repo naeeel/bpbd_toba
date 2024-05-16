@@ -262,7 +262,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           );
 
           await FirebaseFirestore.instance
-              .collection('users')
+              .collection('members')
               .doc(userCredential.user!.uid)
               .set({
             'firstName': _firstNameController.text,

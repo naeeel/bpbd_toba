@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/profil/list_akun.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/profil/report_history_screen.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/profil/edit_profile_screen.dart';
 
@@ -23,7 +24,7 @@ class _TrainingScreenState extends State<TrainingScreen> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final CollectionReference _usersCollection = FirebaseFirestore.instance.collection('users');
+  final CollectionReference _membersCollection = FirebaseFirestore.instance.collection('members');
 
   @override
   void initState() {
@@ -39,7 +40,7 @@ class _TrainingScreenState extends State<TrainingScreen> {
       if (user != null) {
         String userId = user.uid;
 
-        DocumentSnapshot documentSnapshot = await _usersCollection.doc(userId).get();
+        DocumentSnapshot documentSnapshot = await _membersCollection.doc(userId).get();
 
         if (documentSnapshot.exists) {
           setState(() {
@@ -109,7 +110,7 @@ class _TrainingScreenState extends State<TrainingScreen> {
         String imageURL = await uploadImageAndGetURL(imageFile);
 
         // Update profile photo URL in Firestore with the new imageURL
-        await _firestore.collection('users').doc(userId).update({
+        await _firestore.collection('members').doc(userId).update({
           'photoURL': imageURL,
         });
 
@@ -213,7 +214,12 @@ class _TrainingScreenState extends State<TrainingScreen> {
                   leading: Icon(Icons.support),
                   title: Text('Tentang Kami'),
                   onTap: () {
-                    // Handle Support Center tap
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TentangKamiScreen(),
+                      ),
+                    );
                   },
                 ),
                 SizedBox(height: 32),
