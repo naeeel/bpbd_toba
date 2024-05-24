@@ -1,7 +1,19 @@
-import 'package:pelaporan_bencana/petugas_panel/design_petugas_app_theme.dart';
-import 'package:pelaporan_bencana/petugas_panel/models/Category.dart';
-import 'package:pelaporan_bencana/main.dart';
 import 'package:flutter/material.dart';
+import 'package:pelaporan_bencana/petugas_panel/design_petugas_app_theme.dart';
+import 'package:pelaporan_bencana/petugas_panel/models/report_status.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class HexColor extends Color {
+  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
+
+  static int _getColorFromHex(String hexColor) {
+    hexColor = hexColor.toUpperCase().replaceAll('#', '');
+    if (hexColor.length == 6) {
+      hexColor = 'FF' + hexColor;
+    }
+    return int.parse(hexColor, radix: 16);
+  }
+}
 
 class LaporanTerbaruListView extends StatefulWidget {
   const LaporanTerbaruListView({Key? key, this.callBack}) : super(key: key);
@@ -14,17 +26,21 @@ class LaporanTerbaruListView extends StatefulWidget {
 class _LaporanTerbaruListViewState extends State<LaporanTerbaruListView>
     with TickerProviderStateMixin {
   AnimationController? animationController;
+  List<DisasterReport> reports = [];
 
   @override
   void initState() {
     animationController = AnimationController(
         duration: const Duration(milliseconds: 2000), vsync: this);
     super.initState();
+    fetchData();
   }
 
-  Future<bool> getData() async {
-    await Future<dynamic>.delayed(const Duration(milliseconds: 50));
-    return true;
+  Future<void> fetchData() async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('reports').get();
+    setState(() {
+      reports = snapshot.docs.map((doc) => DisasterReport.fromSnapshot(doc)).toList();
+    });
   }
 
   @override
@@ -40,38 +56,27 @@ class _LaporanTerbaruListViewState extends State<LaporanTerbaruListView>
       child: Container(
         height: 134,
         width: double.infinity,
-        child: FutureBuilder<bool>(
-          future: getData(),
-          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-            if (!snapshot.hasData) {
-              return const SizedBox();
-            } else {
-              return ListView.builder(
-                padding: const EdgeInsets.only(
-                    top: 0, bottom: 0, right: 16, left: 16),
-                itemCount: Category.CategoryList.length,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (BuildContext context, int index) {
-                  final int count = Category.CategoryList.length > 10
-                      ? 10
-                      : Category.CategoryList.length;
-                  final Animation<double> animation =
-                      Tween<double>(begin: 0.0, end: 1.0).animate(
-                          CurvedAnimation(
-                              parent: animationController!,
-                              curve: Interval((1 / count) * index, 1.0,
-                                  curve: Curves.fastOutSlowIn)));
-                  animationController?.forward();
+        child: reports.isEmpty
+            ? const SizedBox()
+            : ListView.builder(
+          padding: const EdgeInsets.only(top: 0, bottom: 0, right: 16, left: 16),
+          itemCount: reports.length > 10 ? 10 : reports.length,
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (BuildContext context, int index) {
+            final int count = reports.length > 10 ? 10 : reports.length;
+            final Animation<double> animation = Tween<double>(begin: 0.0, end: 1.0).animate(
+                CurvedAnimation(
+                    parent: animationController!,
+                    curve: Interval((1 / count) * index, 1.0,
+                        curve: Curves.fastOutSlowIn)));
+            animationController?.forward();
 
-                  return CategoryView(
-                    category: Category.CategoryList[index],
-                    animation: animation,
-                    animationController: animationController,
-                    callback: widget.callBack,
-                  );
-                },
-              );
-            }
+            return CategoryView(
+              report: reports[index],
+              animation: animation,
+              animationController: animationController,
+              callback: widget.callBack,
+            );
           },
         ),
       ),
@@ -82,14 +87,14 @@ class _LaporanTerbaruListViewState extends State<LaporanTerbaruListView>
 class CategoryView extends StatelessWidget {
   const CategoryView(
       {Key? key,
-      this.category,
-      this.animationController,
-      this.animation,
-      this.callback})
+        this.report,
+        this.animationController,
+        this.animation,
+        this.callback})
       : super(key: key);
 
   final VoidCallback? callback;
-  final Category? category;
+  final DisasterReport? report;
   final AnimationController? animationController;
   final Animation<double>? animation;
 
@@ -133,17 +138,15 @@ class CategoryView extends StatelessWidget {
                                       child: Column(
                                         children: <Widget>[
                                           Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 14),
+                                            padding: const EdgeInsets.only(top: 14),
                                             child: Text(
-                                              category!.title,
+                                              report!.disasterType,
                                               textAlign: TextAlign.left,
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 16,
                                                 letterSpacing: 0.27,
-                                                color: DesignPetugasAppTheme
-                                                    .darkerText,
+                                                color: DesignPetugasAppTheme.darkerText,
                                               ),
                                             ),
                                           ),
@@ -158,7 +161,7 @@ class CategoryView extends StatelessWidget {
                                               children: <Widget>[
                                                 Expanded(
                                                   child: Text(
-                                                     '${category!.description} ',
+                                                    '${report!.description} ',
                                                     maxLines: 2, // Batasi teks menjadi 2 baris
                                                     overflow: TextOverflow.ellipsis, // Tambahkan ellipsis jika teks melebihi kapasitas
                                                     textAlign: TextAlign.left,
@@ -173,28 +176,22 @@ class CategoryView extends StatelessWidget {
                                               ],
                                             ),
                                           ),
-                                         Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 16, bottom: 8),
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 16, bottom: 8),
                                             child: Row(
-                                              mainAxisAlignment:
-                                                   MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
                                               children: <Widget>[
                                                 Text(
-                                                  '${category!.tanggal} 40 Januari 2023',
+                                                  'Tanggal: ${DateTime.fromMillisecondsSinceEpoch(report!.timestamp * 1000).toLocal()}',
                                                   textAlign: TextAlign.left,
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w200,
                                                     fontSize: 12,
                                                     letterSpacing: 0.27,
-                                                    color: DesignPetugasAppTheme
-                                                        .grey,
+                                                    color: DesignPetugasAppTheme.grey,
                                                   ),
                                                 ),
-                                             
                                               ],
                                             ),
                                           ),
@@ -211,16 +208,14 @@ class CategoryView extends StatelessWidget {
                     ),
                     Container(
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 24, bottom: 24, left: 16),
+                        padding: const EdgeInsets.only(top: 24, bottom: 24, left: 16),
                         child: Row(
                           children: <Widget>[
                             ClipRRect(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(16.0)),
+                              borderRadius: const BorderRadius.all(Radius.circular(16.0)),
                               child: AspectRatio(
                                   aspectRatio: 1.0,
-                                  child: Image.asset(category!.imagePath)),
+                                  child: Image.network(report!.imagePath)),
                             )
                           ],
                         ),
