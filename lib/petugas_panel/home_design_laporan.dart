@@ -1,9 +1,20 @@
 import 'package:pelaporan_bencana/petugas_panel/laporan_terbaru_list_view.dart';
 import 'package:pelaporan_bencana/petugas_panel/laporan_info_screen.dart';
 import 'package:pelaporan_bencana/petugas_panel/laporan_bencana_list_view.dart';
-import 'package:pelaporan_bencana/main.dart';
 import 'package:flutter/material.dart';
 import 'design_petugas_app_theme.dart';
+
+class HexColor extends Color {
+  static int _getColorFromHex(String hexColor) {
+    hexColor = hexColor.toUpperCase().replaceAll('#', '');
+    if (hexColor.length == 6) {
+      hexColor = 'FF' + hexColor;
+    }
+    return int.parse(hexColor, radix: 16);
+  }
+
+  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
+}
 
 class DesignCourseHomeScreen extends StatefulWidget {
   @override
@@ -31,10 +42,10 @@ class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
                   height: MediaQuery.of(context).size.height,
                   child: Column(
                     children: <Widget>[
-                      getSearchBarUI(),
+                      getSearchBarUI(context),
                       getKategoriUI(),
                       Flexible(
-                        child: getLporanBencanaUI(),
+                        child: getLaporanBencanaUI(),
                       ),
                     ],
                   ),
@@ -47,88 +58,86 @@ class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
     );
   }
 
- Widget getKategoriUI() {
-  return Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: <Widget>[
-      Padding(
-        padding: const EdgeInsets.only(top: 15.0, left: 18, right: 16),
-        child: Text(
-          'Categori Bencana',
-          textAlign: TextAlign.left,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 22,
-            letterSpacing: 0.27,
-            color: DesignPetugasAppTheme.darkerText,
+  Widget getKategoriUI() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(top: 15.0, left: 18, right: 16),
+          child: Text(
+            'Categori Bencana',
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 22,
+              letterSpacing: 0.27,
+              color: DesignPetugasAppTheme.darkerText,
+            ),
           ),
         ),
-      ),
-      const SizedBox(
-        height: 16,
-      ),
-      SizedBox(
-        height: 50,
-        child: ListView(
-          padding: const EdgeInsets.only(left: 16, right: 16),
-          scrollDirection: Axis.horizontal,
-          children: <Widget>[
-            getButtonUI(
-                CategoryType.gempa, categoryType == CategoryType.gempa),
-            const SizedBox(
-              width: 16,
-            ),
-            getButtonUI(
-                CategoryType.banjir, categoryType == CategoryType.banjir),
-            const SizedBox(
-              width: 16,
-            ),
-            getButtonUI(
-                CategoryType.kebakaran, categoryType == CategoryType.kebakaran),
-            const SizedBox(
-              width: 16,
-            ),
-            getButtonUI(
-                CategoryType.longsor, categoryType == CategoryType.longsor),
-            const SizedBox(
-              width: 16,
-            ),
-            getButtonUI(
-                CategoryType.gunung, categoryType == CategoryType.gunung),
-            const SizedBox(
-              width: 16,
-            ),
-            getButtonUI(
-                CategoryType.angin, categoryType == CategoryType.angin),
-            const SizedBox(
-              width: 16,
-            ),
-            getButtonUI(
-                CategoryType.tsunami, categoryType == CategoryType.tsunami),
-            const SizedBox(
-              width: 16,
-            ),
-            getButtonUI(
-                CategoryType.lainnya, categoryType == CategoryType.lainnya),
-          ],
+        const SizedBox(
+          height: 16,
         ),
-      ),
-      const SizedBox(
-        height: 16,
-      ),
-      LaporanTerbaruListView(
-        callBack: () {
-          moveTo();
-        },
-      ),
-    ],
-  );
-}
+        SizedBox(
+          height: 50,
+          child: ListView(
+            padding: const EdgeInsets.only(left: 16, right: 16),
+            scrollDirection: Axis.horizontal,
+            children: <Widget>[
+              getButtonUI(
+                  CategoryType.gempa, categoryType == CategoryType.gempa),
+              const SizedBox(
+                width: 16,
+              ),
+              getButtonUI(
+                  CategoryType.banjir, categoryType == CategoryType.banjir),
+              const SizedBox(
+                width: 16,
+              ),
+              getButtonUI(
+                  CategoryType.kebakaran, categoryType == CategoryType.kebakaran),
+              const SizedBox(
+                width: 16,
+              ),
+              getButtonUI(
+                  CategoryType.longsor, categoryType == CategoryType.longsor),
+              const SizedBox(
+                width: 16,
+              ),
+              getButtonUI(
+                  CategoryType.gunung, categoryType == CategoryType.gunung),
+              const SizedBox(
+                width: 16,
+              ),
+              getButtonUI(
+                  CategoryType.angin, categoryType == CategoryType.angin),
+              const SizedBox(
+                width: 16,
+              ),
+              getButtonUI(
+                  CategoryType.tsunami, categoryType == CategoryType.tsunami),
+              const SizedBox(
+                width: 16,
+              ),
+              getButtonUI(
+                  CategoryType.lainnya, categoryType == CategoryType.lainnya),
+            ],
+          ),
+        ),
+        const SizedBox(
+          height: 16,
+        ),
+        LaporanTerbaruListView(
+          callBack: () {
+            moveTo();
+          },
+        ),
+      ],
+    );
+  }
 
-
-
-  Widget getLporanBencanaUI() {
+  Widget getLaporanBencanaUI() {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0, left: 18, right: 16),
       child: Column(
@@ -168,7 +177,7 @@ class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
 
   Widget getButtonUI(CategoryType categoryTypeData, bool isSelected) {
     String txt = '';
-     if (CategoryType.gempa == categoryTypeData) {
+    if (CategoryType.gempa == categoryTypeData) {
       txt = 'Gempa';
     } else if (CategoryType.banjir == categoryTypeData) {
       txt = 'Banjir';
@@ -227,7 +236,7 @@ class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
     );
   }
 
-  Widget getSearchBarUI() {
+  Widget getSearchBarUI(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0, left: 18),
       child: Row(
@@ -344,7 +353,6 @@ class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
 }
 
 enum CategoryType {
-  
   gempa,
   banjir,
   kebakaran,
