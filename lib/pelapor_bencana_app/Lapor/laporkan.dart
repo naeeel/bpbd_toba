@@ -21,7 +21,6 @@ class LaporApp extends StatelessWidget {
     return MaterialApp(
       title: 'Laporan Bencana',
       theme: ThemeData(
-        // Modern theme with a dark blue primary color
         primaryColor: Colors.blue[800],
         scaffoldBackgroundColor: Colors.grey[100],
         colorScheme: ColorScheme.fromSwatch().copyWith(
@@ -63,13 +62,13 @@ class _LaporPageState extends State<LaporPage> {
             children: [
               Text(
                 'Laporkan Kejadian',
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold ,fontFamily: 'roboto'),
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, fontFamily: 'Roboto'),
                 textAlign: TextAlign.left,
               ),
               SizedBox(height: 10),
               Text(
                 'Bencana',
-                style: TextStyle(fontSize: 25, color: Colors.orange, fontWeight: FontWeight.bold, fontFamily: 'roboto'),
+                style: TextStyle(fontSize: 25, color: Colors.orange, fontWeight: FontWeight.bold, fontFamily: 'Roboto'),
                 textAlign: TextAlign.left,
               ),
               SizedBox(height: 20),
@@ -78,23 +77,22 @@ class _LaporPageState extends State<LaporPage> {
                 child: Container(
                   height: MediaQuery.of(context).size.height * 0.2,
                   decoration: BoxDecoration(
-                    color: Colors.white, // Warna putih
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.10), 
+                        color: Colors.grey.withOpacity(0.10),
                         spreadRadius: 6,
                         blurRadius: 3,
-                        offset: Offset(0, 2), 
+                        offset: Offset(0, 2),
                       ),
                     ],
                   ),
                   child: Center(
-                  child: _pickedImage != null
-                    ? Image.file(_pickedImage!)
-                    : Icon(Icons.camera_alt, size: 40, color: Colors.grey), 
-                ),
-
+                    child: _pickedImage != null
+                        ? Image.file(_pickedImage!)
+                        : Icon(Icons.camera_alt, size: 40, color: Colors.grey),
+                  ),
                 ),
               ),
               SizedBox(height: 20),
@@ -106,279 +104,331 @@ class _LaporPageState extends State<LaporPage> {
                   textAlign: TextAlign.left,
                 ),
               ),
-
               SizedBox(height: 10),
-                GestureDetector(
-                  onTap: () => _showDisasterPicker(context),
-                  child: Container(
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.white, 
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                        color: Colors.grey.withOpacity(0.10), 
+              GestureDetector(
+                onTap: () => _showDisasterPicker(context),
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.10),
                         spreadRadius: 6,
                         blurRadius: 3,
-                        offset: Offset(0, 2), 
+                        offset: Offset(0, 2),
                       ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        _selectedDisasterType,
-                        style: TextStyle(fontSize: 15, fontFamily: 'Roboto'),
-                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      _selectedDisasterType,
+                      style: TextStyle(fontSize: 15, fontFamily: 'Roboto'),
                     ),
                   ),
                 ),
-
-                  SizedBox(height: 20),
-                    GestureDetector(
-                      onTap: () => _pickLocation(context),
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white, 
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                           BoxShadow(
-                              color: Colors.grey.withOpacity(0.10), 
-                              spreadRadius: 6,
-                              blurRadius: 3,
-                              offset: Offset(0, 2), 
+              ),
+              SizedBox(height: 20),
+              GestureDetector(
+                onTap: () => _pickLocation(context),
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.10),
+                        spreadRadius: 6,
+                        blurRadius: 3,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Text(
+                              _selectedLocation != null
+                                  ? "Lat: ${_selectedLocation!.latitude}, Lng: ${_selectedLocation!.longitude}"
+                                  : "Lokasi Bencana",
+                              style: TextStyle(fontSize: 15, fontFamily: 'Roboto'),
                             ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Posisikan item secara merata di sepanjang row
-                          children: [
-                            Expanded(
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                  child: Text(
-                                    _selectedLocation != null
-                                        ? "Lat: ${_selectedLocation!.latitude}, Lng: ${_selectedLocation!.longitude}"
-                                        : "Lokasi Bencana",
-                                    style: TextStyle(fontSize: 15,  fontFamily: 'Roboto'),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.10),
+                      spreadRadius: 6,
+                      blurRadius: 3,
+                      offset: Offset(0, 2),
                     ),
-                    SizedBox(height: 20),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white, 
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                            color: Colors.grey.withOpacity(0.10), 
-                            spreadRadius: 6,
-                            blurRadius: 3,
-                            offset: Offset(0, 2), 
-                          ),
-                          ],
-                        ),
-                        child: TextFormField(
-                          controller: _keteranganController,
-                          maxLines: 3,
-                          decoration: InputDecoration(
-                            labelText: 'Keterangan Bencana',
-                            border: InputBorder.none, 
-                            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0), // Padding
-                          ),
-                          style: TextStyle(fontSize: 15, fontFamily: 'Roboto'), // Ganti style teks
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: _isDataSent || _isSending ? null : () => _submitReport(context),
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                              _isDataSent || _isSending ? Colors.grey : Colors.orange),
-                            minimumSize: MaterialStateProperty.all<Size>(
-                              Size(double.infinity, 50)),
-                          ),
-                          child: _isSending
-                            ? CircularProgressIndicator()
-                            : Text(
-                                'Laporkan',
-                                style: TextStyle(
-                                  color: Colors.white, 
-                                  fontFamily: 'Roboto', 
-                                ),
-                              ),
-                        ),
+                  ],
+                ),
+                child: TextFormField(
+                  controller: _keteranganController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: 'Keterangan Bencana',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                  ),
+                  style: TextStyle(fontSize: 15, fontFamily: 'Roboto'),
+                ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _isDataSent || _isSending ? null : () => _submitReport(context),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                      _isDataSent || _isSending ? Colors.grey : Colors.orange),
+                  minimumSize: MaterialStateProperty.all<Size>(Size(double.infinity, 50)),
+                ),
+                child: _isSending
+                    ? CircularProgressIndicator()
+                    : Text(
+                  'Laporkan',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Roboto',
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              _isDataSent
+                  ? Text(
+                'Data sudah terkirim!',
+                style: TextStyle(fontFamily: 'Roboto', color: Colors.green),
+              )
+                  : SizedBox(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-                              SizedBox(height: 10),
-                              _isDataSent
-                                  ? Text(
-                                      'Data sudah terkirim!',
-                                      style: TextStyle(fontFamily: 'Roboto', color: Colors.green),
-                                    )
-                                  : SizedBox(),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }
-                  void _pickImage() async {
-                    final picker = ImagePicker();
-                    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-                    if (pickedFile != null) {
-                      setState(() {
-                        _pickedImage = File(pickedFile.path);
-                      });
-                    }
-                  }
-                  Future<void> _pickLocation(BuildContext context) async {
-                    LatLng? pickedLocation = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LocationPickerMap(),
-                      ),
-                    );
+  void _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        _pickedImage = File(pickedFile.path);
+      });
+    }
+  }
 
-                    if (pickedLocation != null) {
-                      setState(() {
-                        _selectedLocation = pickedLocation;
-                      });
-                    }
-                  }
-                  Future<void> _submitReport(BuildContext context) async {
-                    if (_pickedImage == null ||
-                        _selectedLocation == null ||
-                        _keteranganController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Harap lengkapi semua informasi.',
-                            textAlign: TextAlign.center, 
-                            style: TextStyle(
-                              fontFamily: 'Roboto', 
-                            ),
-                          ),
-                        ),
-                      );
-                      return;
-                    }
-                    setState(() {
-                      _isSending = true;
-                    });
-                    try {
-                      // Get a reference to the Firebase Storage
-                      final storage = FirebaseStorage.instance;
+  Future<void> _pickLocation(BuildContext context) async {
+    LatLng? pickedLocation = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LocationPickerMap(),
+      ),
+    );
 
-                      // Create a reference to the image file
-                      final ref = storage.ref().child('images/${DateTime.now()}.jpg');
+    if (pickedLocation != null) {
+      setState(() {
+        _selectedLocation = pickedLocation;
+      });
+    }
+  }
 
-                      // Upload image to Firebase Storage
-                      final uploadTask = ref.putFile(_pickedImage!);
-                      final snapshot = await uploadTask.whenComplete(() {});
+  Future<void> _submitReport(BuildContext context) async {
+    if (_pickedImage == null ||
+        _selectedLocation == null ||
+        _keteranganController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Harap lengkapi semua informasi.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Roboto',
+            ),
+          ),
+        ),
+      );
+      return;
+    }
 
-                      // Get download URL
-                      final imageURL = await snapshot.ref.getDownloadURL();
+    setState(() {
+      _isSending = true;
+    });
 
-                      // Get a reference to the Firestore collection
-                      CollectionReference reportsRef =
-                      FirebaseFirestore.instance.collection('laporan');
+    try {
+      // Get a reference to the Firebase Storage
+      final storage = FirebaseStorage.instance;
 
-                      // Get current user ID
-                      String userId = FirebaseAuth.instance.currentUser!.uid;
+      // Create a reference to the image file
+      final ref = storage.ref().child('images/${DateTime.now()}.jpg');
 
-                      // Misalnya, inisialisasi status sebagai 'sent' saat membuat laporan baru
-                      ReportStatus status = ReportStatus.sent;
+      // Upload image to Firebase Storage
+      final uploadTask = ref.putFile(_pickedImage!);
+      final snapshot = await uploadTask.whenComplete(() => {});
 
-                      // Create a new document with a unique ID
-                      await reportsRef.add({
-                        'userId': userId, // Add user ID to the report data
-                        'disasterType': _selectedDisasterType,
-                        'imagePath': imageURL, // Add imageURL to the document
-                        'latitude': _selectedLocation!.latitude,
-                        'longitude': _selectedLocation!.longitude,
-                        'keterangan': _keteranganController.text,
-                        'timestamp': DateTime.now().millisecondsSinceEpoch,
-                        'status': status.toString(), // Add status to the document
-                      });
+      // Get the download URL of the uploaded image
+      final imageUrl = await snapshot.ref.getDownloadURL();
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Laporan berhasil dikirim.',
-                            textAlign: TextAlign.center, 
-                            style: TextStyle(
-                              fontFamily: 'Roboto', 
-                            ),
-                          ),
-                        ),
-                      );
-                      setState(() {
-                        _isDataSent = true;
-                      });
-                    } catch (error) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Gagal mengirim laporan: $error',
-                            textAlign: TextAlign.center, 
-                            style: TextStyle(
-                              fontFamily: 'Roboto', 
-                            ),
-                          ),
-                        ),
-                      );
-                    } finally {
-                      setState(() {
-                        _isSending = false;
-                      });
-                    }
-                  }
+      // Get the current user
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        print('Current user ID: ${user.uid}'); // Tambahkan pesan debug
 
-                  void _showDisasterPicker(BuildContext context) {
-                    showCupertinoModalPopup(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Container(
-                          height: 200,
-                          child: CupertinoPicker(
-                            backgroundColor: Colors.white,
-                            itemExtent: 40,
-                            onSelectedItemChanged: (int index) {
-                              setState(() {
-                                _selectedDisasterType = _disasterTypes[index];
-                              });
-                            },
-                            children: _disasterTypes.map((String type) {
-                              return Center(
-                                child: Text(
-                                  type,
-                                    style: TextStyle(fontSize: 15,  fontFamily: 'Roboto'),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        );
-                      },
-                    );
-                  }
+        // Cari dokumen pengguna berdasarkan UID
+        final userQuerySnapshot = await FirebaseFirestore.instance
+            .collection('members')
+            .where('uid', isEqualTo: user.uid)
+            .get();
 
-                  final List<String> _disasterTypes = [
-                    'Gempa Bumi',
-                    'Banjir',
-                    'Kebakaran',
-                    'Tanah Longsor',
-                    'Gunung Merapi',
-                    'Angin Topan',
-                    'Tsunami',
-                    'Opsi Lainnya'
-                  ];
-                }
+        if (userQuerySnapshot.docs.isNotEmpty) {
+          final userDoc = userQuerySnapshot.docs.first;
+          final userData = userDoc.data();
+          print('User data: $userData'); // Tambahkan pesan debug
+
+          final firstName = userData['firstName'] as String;
+          final lastName = userData['lastName'] as String;
+
+          // Combine firstName and lastName to create userId
+          final userId = '$firstName $lastName';
+
+          // Add report data to Firestore
+          await FirebaseFirestore.instance.collection('laporan').add({
+            'userId': userId,
+            'imageUrl': imageUrl,
+            'disasterType': _selectedDisasterType,
+            'description': _keteranganController.text,
+            'location': GeoPoint(_selectedLocation!.latitude, _selectedLocation!.longitude),
+            'timestamp': FieldValue.serverTimestamp(),
+          });
+
+          setState(() {
+            _isDataSent = true;
+            _pickedImage = null;
+            _selectedLocation = null;
+            _keteranganController.clear();
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Laporan berhasil dikirim.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Roboto',
+                ),
+              ),
+            ),
+          );
+        } else {
+          print('User data not found in Firestore for userId: ${user.uid}');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Data pengguna tidak ditemukan di Firestore.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Roboto',
+                ),
+              ),
+            ),
+          );
+        }
+      } else {
+        print('User is not logged in.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Pengguna belum masuk.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Roboto',
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (error) {
+      print('Error uploading data: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Terjadi kesalahan saat mengirim laporan.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Roboto',
+            ),
+          ),
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSending = false;
+      });
+    }
+  }
+
+  void _showDisasterPicker(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (_) => Container(
+        height: 250,
+        color: Color.fromARGB(255, 255, 255, 255),
+        child: Column(
+          children: [
+            Container(
+              height: 200,
+              child: CupertinoPicker(
+                backgroundColor: Colors.white,
+                itemExtent: 30,
+                scrollController: FixedExtentScrollController(
+                  initialItem: 0,
+                ),
+                onSelectedItemChanged: (int index) {
+                  setState(() {
+                    _selectedDisasterType = _disasterTypes[index];
+                  });
+                },
+                children: _disasterTypes
+                    .map((item) => Center(child: Text(item)))
+                    .toList(),
+              ),
+            ),
+            CupertinoButton(
+              child: Text('Pilih'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  final List<String> _disasterTypes = [
+    'Gempa Bumi',
+    'Banjir',
+    'Tanah Longsor',
+    'Kebakaran',
+    'Badai',
+    'Tsunami',
+    'Erupsi Gunung',
+    'Lainnya',
+  ];
+}
 
 enum ReportStatus { sent, inProgress, completed, rejected }
 
@@ -386,7 +436,7 @@ class Report {
   final String id;
   final String userId;
   final String disasterType;
-  final String imagePath; // Field imagePath untuk menyimpan URL gambar
+  final String imagePath;
   final double latitude;
   final double longitude;
   final String keterangan;
@@ -410,7 +460,7 @@ class Report {
       id: snapshot.id,
       userId: snapshot['userId'] ?? '',
       disasterType: snapshot['disasterType'] ?? '',
-      imagePath: snapshot['imagePath'] ?? '', // Mengambil imagePath dari Firestore
+      imagePath: snapshot['imagePath'] ?? '',
       latitude: (snapshot['latitude'] ?? 0.0) as double,
       longitude: (snapshot['longitude'] ?? 0.0) as double,
       keterangan: snapshot['keterangan'] ?? '',
