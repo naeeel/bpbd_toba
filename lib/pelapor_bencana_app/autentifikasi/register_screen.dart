@@ -255,21 +255,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
           _isLoading = true;
         });
         try {
-          UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: _emailController.text,
             password: _passwordController.text,
           );
 
+          // Buat ID dokumen dengan menggabungkan firstName dan lastName
+          String documentId = '${_firstNameController.text}_${_lastNameController.text}';
+
           await FirebaseFirestore.instance
               .collection('members')
-              .doc(userCredential.user!.uid)
+              .doc(documentId) // Gunakan ID dokumen yang dibuat
               .set({
+            'uid': userCredential.user!.uid, // Simpan UID di dokumen pengguna
             'firstName': _firstNameController.text,
             'lastName': _lastNameController.text,
             'nik': _nikController.text,
             'email': _emailController.text,
-            'phone': _phoneController.text.replaceAll("+62 ", ""), // Removed prefix text
+            'phone': _phoneController.text.replaceAll("+62 ", ""),
           });
 
           Navigator.push(
@@ -281,8 +284,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         } catch (e) {
           print('Error registering user: $e');
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content:
-            Text('Terjadi kesalahan, silakan coba lagi nanti'),
+            content: Text('Terjadi kesalahan, silakan coba lagi nanti'),
           ));
         } finally {
           setState(() {
