@@ -4,7 +4,7 @@ import 'package:pelaporan_bencana/pelapor_bencana_app/models/tabIcon_data.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/profil/profil_screen.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/bottom_navigation_view/bottom_bar_view.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_theme.dart';
-import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/my_diary_screen.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/peringatan_dini_screen.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/mitigasi/mitigasi_screen.dart';
 
 class PelaporansAppHomeScreen extends StatefulWidget {
@@ -88,7 +88,8 @@ class _PelaporansAppHomeScreenState extends State<PelaporansAppHomeScreen>
                   return;
                 }
                 setState(() {
-                  tabBody = MyDiaryScreen(animationController: animationController);
+                  tabBody =
+                      MyDiaryScreen(animationController: animationController);
                 });
               });
             } else if (index == 1) {
@@ -97,11 +98,12 @@ class _PelaporansAppHomeScreenState extends State<PelaporansAppHomeScreen>
                   return;
                 }
                 setState(() {
-                  tabBody = MitigasiScreen(animationController: animationController);
+                  tabBody =
+                      MitigasiScreen(animationController: animationController);
                 });
               });
             } else if (index == 2) {
-              animationController?.reverse().then<dynamic>((data){
+              animationController?.reverse().then<dynamic>((data) {
                 if (!mounted) {
                   return;
                 }
@@ -115,7 +117,8 @@ class _PelaporansAppHomeScreenState extends State<PelaporansAppHomeScreen>
                   return;
                 }
                 setState(() {
-                  tabBody = TrainingScreen(animationController: animationController);
+                  tabBody =
+                      TrainingScreen(animationController: animationController);
                 });
               });
             }
