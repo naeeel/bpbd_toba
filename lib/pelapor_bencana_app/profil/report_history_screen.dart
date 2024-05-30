@@ -1,108 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pelaporan_bencana/model/report_status.dart';
 
-enum ReportStatus { sent, inProgress, completed, rejected }
-
-class Report {
-  final String id;
-  final String userId;
-  final String disasterType;
-  final String imagePath;
-  final double latitude;
-  final double longitude;
-  final String keterangan;
-  final int timestamp;
-  final ReportStatus status;
-
-  Report({
-    required this.id,
-    required this.userId,
-    required this.disasterType,
-    required this.imagePath,
-    required this.latitude,
-    required this.longitude,
-    required this.keterangan,
-    required this.timestamp,
-    required this.status,
-  });
-
-  factory Report.fromSnapshot(DocumentSnapshot snapshot) {
-    return Report(
-      id: snapshot.id,
-      userId: snapshot['userId'] ?? '',
-      disasterType: snapshot['disasterType'] ?? '',
-      imagePath: snapshot['imagePath'] ?? '',
-      latitude: (snapshot['latitude'] ?? 0.0) as double,
-      longitude: (snapshot['longitude'] ?? 0.0) as double,
-      keterangan: snapshot['keterangan'] ?? '',
-      timestamp: (snapshot['timestamp'] ?? 0) as int,
-      status: _getStatusFromString(snapshot['status'] ?? ''),
-    );
-  }
-
-  static ReportStatus _getStatusFromString(String statusString) {
-    switch (statusString) {
-      case 'sent':
-        return ReportStatus.sent;
-      case 'inProgress':
-        return ReportStatus.inProgress;
-      case 'completed':
-        return ReportStatus.completed;
-      case 'rejected':
-        return ReportStatus.rejected;
-      default:
-        return ReportStatus.sent;
-    }
-  }
-
-  Icon getStatusIcon() {
-    switch (status) {
-      case ReportStatus.sent:
-        return Icon(Icons.send);
-      case ReportStatus.inProgress:
-        return Icon(Icons.hourglass_top);
-      case ReportStatus.completed:
-        return Icon(Icons.done);
-      case ReportStatus.rejected:
-        return Icon(Icons.close);
-    }
-  }
-}
-
-class ReportHistoryScreen extends StatefulWidget {
+class ReportHistoryScreen extends StatelessWidget {
   final List<Report> userReports;
 
-  const ReportHistoryScreen({Key? key, required this.userReports})
-      : super(key: key);
-
-  @override
-  _ReportHistoryScreenState createState() => _ReportHistoryScreenState();
-}
-
-class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
-  late List<Report> _userReports;
-
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-  GlobalKey<RefreshIndicatorState>();
-
-  @override
-  void initState() {
-    super.initState();
-    _userReports = widget.userReports;
-  }
-
-  Future<void> _refreshData() async {
-    await Future.delayed(Duration(seconds: 1)); // Simulating delay
-
-    // Fetch updated data from Firestore
-    // You may need to implement logic to fetch data from Firestore again
-    // and update _userReports
-
-    setState(() {
-      // Update _userReports with new data
-    });
-  }
+  ReportHistoryScreen({required this.userReports});
 
   @override
   Widget build(BuildContext context) {
@@ -110,322 +12,34 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
       appBar: AppBar(
         title: Text('Historis Pelaporan'),
       ),
-      body: RefreshIndicator(
-        key: _refreshIndicatorKey,
-        onRefresh: _refreshData,
-        child: _userReports.isEmpty
-            ? Center(
-          child: Text('Tidak ada laporan'),
-        )
-            : ListView.builder(
-          itemCount: _userReports.length,
-          itemBuilder: (context, index) {
-            Report report = _userReports[index];
-            return Padding(
-              padding: const EdgeInsets.symmetric(
-                  vertical: 8.0, horizontal: 16.0),
-              child: Card(
-                elevation: 4,
-                child: ListTile(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ReportDetailScreen(report: report),
-                      ),
-                    );
-                  },
-                  leading: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: NetworkImage(report.imagePath),
-                      ),
-                    ),
-                  ),
-                  title: Text(
-                    report.disasterType,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: Text(
-                    'Latitude: ${report.latitude}, Longitude: ${report.longitude}',
-                    style: TextStyle(
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                  trailing: report.getStatusIcon(),
-                ),
+      body: userReports.isEmpty
+          ? Center(child: Text('Belum ada laporan yang dikirim.'))
+          : ListView.builder(
+        itemCount: userReports.length,
+        itemBuilder: (context, index) {
+          final report = userReports[index];
+          return Card(
+            margin: EdgeInsets.all(10),
+            child: ListTile(
+              leading: report.getStatusIcon(),
+              title: Text(report.disasterType),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(report.keterangan),
+                  Text(
+                      'Lokasi: ${report.latitude}, ${report.longitude}'),
+                  Text('Waktu: ${report.getFormattedTimestamp()}'),
+                ],
               ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class ReportDetailScreen extends StatelessWidget {
-  final Report report;
-
-  const ReportDetailScreen({Key? key, required this.report}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Detail Pelaporan'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(report.imagePath),
-            SizedBox(height: 16),
-            Text(
-              'Jenis Bencana: ${report.disasterType}',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Lokasi Bencana: Latitude: ${report.latitude}, Longitude: ${report.longitude}',
-              style: TextStyle(
-                fontSize: 16,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Keterangan: ${report.keterangan}',
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Status: ${_getStatusText(report.status)}',
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _getStatusText(ReportStatus status) {
-    switch (status) {
-      case ReportStatus.sent:
-        return 'Terkirim';
-      case ReportStatus.inProgress:
-        return 'Sedang Diproses';
-      case ReportStatus.completed:
-        return 'Selesai';
-      case ReportStatus.rejected:
-        return 'Ditolak';
-      default:
-        return 'Terkirim';
-    }
-  }
-}
-
-class TrainingScreen extends StatefulWidget {
-  const TrainingScreen({Key? key, this.animationController}) : super(key: key);
-
-  final AnimationController? animationController;
-  @override
-  _TrainingScreenState createState() => _TrainingScreenState();
-}
-
-class _TrainingScreenState extends State<TrainingScreen> {
-  late String _firstName = '';
-  late String _lastName = '';
-  late String _email = '';
-  late List<Report> _userReports = [];
-
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  @override
-  void initState() {
-    super.initState();
-    _getUserData();
-    _getUserReports();
-  }
-
-  Future<void> _getUserData() async {
-    try {
-      User? user = _auth.currentUser;
-
-      if (user != null) {
-        String userId = user.uid;
-
-        DocumentSnapshot documentSnapshot =
-        await _firestore.collection('users').doc(userId).get();
-
-        if (documentSnapshot.exists) {
-          setState(() {
-            _firstName = documentSnapshot.get('firstName') ?? '';
-            _lastName = documentSnapshot.get('lastName') ?? '';
-            _email = documentSnapshot.get('email') ?? '';
-          });
-        } else {
-          print('Document does not exist');
-        }
-      }
-    } catch (e) {
-      print('Error fetching user data: $e');
-    }
-  }
-
-  Future<void> _getUserReports() async {
-    try {
-      User? user = _auth.currentUser;
-
-      if (user != null) {
-        String userId = user.uid;
-
-        QuerySnapshot querySnapshot = await _firestore
-            .collection('laporan')
-            .where('userId', isEqualTo: userId)
-            .orderBy('timestamp', descending: true)
-            .get();
-
-        List<Report> reports = querySnapshot.docs
-            .map((doc) => Report.fromSnapshot(doc))
-            .toList();
-
-        setState(() {
-          _userReports = reports;
-        });
-      }
-    } catch (e) {
-      print('Error fetching user reports: $e');
-    }
-  }
-
-  Future<void> createReport() async {
-    try {
-      User? user = _auth.currentUser;
-
-      if (user != null) {
-        String userId = user.uid;
-
-        ReportStatus status = ReportStatus.sent;
-
-        await _firestore.collection('laporan').add({
-          'userId': userId,
-          'disasterType': 'Tipe bencana',
-          'imagePath': 'path/to/image.jpg',
-          'latitude': 0.0,
-          'longitude': 0.0,
-          'keterangan': 'Keterangan laporan',
-          'timestamp': Timestamp.now().millisecondsSinceEpoch,
-          'status': status.toString(),
-        });
-
-        // Menampilkan pesan umpan balik
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Laporan berhasil dibuat!'),
-          ),
-        );
-      }
-    } catch (e) {
-      print('Error creating report: $e');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Profile'),
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(
-              radius: 60,
-              backgroundImage: AssetImage('assets/images/profile_picture.jpg'),
-            ),
-            SizedBox(height: 16),
-            Text(
-              '$_firstName $_lastName',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              _email,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-            SizedBox(height: 32),
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text('Profile'),
+              trailing: Icon(Icons.arrow_forward),
               onTap: () {
-                // Handle Profile tap
+                // Optionally, implement navigation to a detailed report screen
               },
             ),
-            ListTile(
-              leading: Icon(Icons.history),
-              title: Text('Historis Pelaporan'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ReportHistoryScreen(userReports: _userReports),
-                  ),
-                );
-              },
-            ),
-            ElevatedButton(
-              onPressed: () {
-                createReport();
-              },
-              child: Text('Buat Laporan'),
-            ),
-            SizedBox(height: 32),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: TrainingScreen(),
-    theme: ThemeData(
-      primaryColor: Colors.blue, // Warna utama aplikasi
-      // backgroundColor: Colors.white, // Warna latar belakang (Deprecated)
-      colorScheme: ColorScheme.fromSwatch(
-        primarySwatch: Colors.blue, // Warna utama aplikasi
-      ).copyWith(
-        background: Colors.white, // Warna latar belakang
-      ),
-      // Tambahan tema lainnya...
-    ),
-  ));
 }

@@ -94,7 +94,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         if (value == null || value.isEmpty) {
                           return 'NIK diperlukan';
                         }
-                        // You can add more specific validation for NIK if needed
                         return null;
                       },
                     ),
@@ -118,11 +117,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     _buildTextFormField(
                       controller: _phoneController,
                       labelText: 'Nomor Telepon',
-                      prefixText: '+62 ', // Added prefix text
+                      prefixText: '+62 ',
                       prefixIcon: Icons.phone,
                       keyboardType: TextInputType.phone,
                       validator: (value) {
-                        // Menghapus prefiks "+62 " sebelum melakukan validasi
                         String phoneNumber = value!.replaceAll("+62 ", "");
                         if (phoneNumber.isEmpty) {
                           return "Masukkan nomor telepon anda dengan benar";
@@ -255,19 +253,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
           _isLoading = true;
         });
         try {
-          UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: _emailController.text,
             password: _passwordController.text,
           );
 
-          // Buat ID dokumen dengan menggabungkan firstName dan lastName
-          String documentId = '${_firstNameController.text}_${_lastNameController.text}';
+          // Buat ID dokumen dengan menggabungkan nama depan dan belakang
+          String firstName = _firstNameController.text.replaceAll(' ', ''); // Hapus spasi dari nama depan
+          String lastName = _lastNameController.text.replaceAll(' ', ''); // Hapus spasi dari nama belakang
+          String documentId = '$firstName$lastName';
+
+          // Gunakan kombinasi nama depan dan belakang sebagai UID
+          String combinedUid = documentId;
 
           await FirebaseFirestore.instance
               .collection('members')
-              .doc(documentId) // Gunakan ID dokumen yang dibuat
+              .doc(documentId)
               .set({
-            'uid': userCredential.user!.uid, // Simpan UID di dokumen pengguna
+            'uid': combinedUid, // Simpan kombinasi UID di dokumen pengguna
             'firstName': _firstNameController.text,
             'lastName': _lastNameController.text,
             'nik': _nikController.text,
@@ -294,12 +297,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     }
   }
-
   Widget _buildTextFormField({
     required TextEditingController controller,
     required String labelText,
     required IconData prefixIcon,
-    Widget? suffixIcon, // Changed the type to Widget?
+    Widget? suffixIcon,
     TextInputType? keyboardType,
     List<TextInputFormatter>? inputFormatters,
     String? prefixText,

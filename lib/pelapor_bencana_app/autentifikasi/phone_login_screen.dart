@@ -12,8 +12,7 @@ class PhoneLoginPage extends StatefulWidget {
   State<PhoneLoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<PhoneLoginPage>
-    with SingleTickerProviderStateMixin {
+class _LoginPageState extends State<PhoneLoginPage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   TextEditingController _phoneController = TextEditingController();
@@ -30,7 +29,8 @@ class _LoginPageState extends State<PhoneLoginPage>
 
   void handleSubmit(BuildContext context) {
     if (_formKey1.currentState!.validate()) {
-      AuthService.loginWithOtp(otp: _otpController.text).then((value) {
+      AuthService.loginWithOtp(otp: _otpController.text)
+          .then((value) {
         if (value == "Success") {
           // Add the phone number to the database
           addPhoneNumberToDatabase(_phoneController.text);
@@ -52,6 +52,16 @@ class _LoginPageState extends State<PhoneLoginPage>
             backgroundColor: Colors.red,
           ));
         }
+      }).catchError((error) {
+        print("Error logging in with OTP: $error");
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+            "An error occurred while logging in with OTP",
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+        ));
       });
     }
   }
@@ -68,12 +78,16 @@ class _LoginPageState extends State<PhoneLoginPage>
 
   // Function to check if the phone number is already registered
   Future<bool> isPhoneNumberRegistered(String phoneNumber) async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('members')
-        .where('phone', isEqualTo: phoneNumber.replaceAll("+62 ", ""))
-        .get();
-
-    return querySnapshot.docs.isNotEmpty;
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('members')
+          .where('phone', isEqualTo: phoneNumber.replaceAll("+62 ", ""))
+          .get();
+      return querySnapshot.docs.isNotEmpty;
+    } catch (e) {
+      print("Error querying Firestore: $e");
+      return false;
+    }
   }
 
   @override
@@ -96,7 +110,6 @@ class _LoginPageState extends State<PhoneLoginPage>
     return Scaffold(
       appBar: AppBar(
         title: Text('Masuk dengan Nomor Telepon'),
-        // Tambahkan tombol kembali di sini
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -112,17 +125,17 @@ class _LoginPageState extends State<PhoneLoginPage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 200, // Atur lebar sesuai kebutuhan
-                height: 200, // Atur tinggi sesuai kebutuhan
+                width: 200,
+                height: 200,
                 child: Image.asset(
                   "assets/pelaporan_app/log-in.png",
                   fit: BoxFit.cover,
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(12.0, 0, 12.0, 40.0), // Mengatur margin bottom
+                padding: const EdgeInsets.fromLTRB(12.0, 0, 12.0, 40.0),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center, // Mengatur kolom menjadi rata tengah
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       "Selamat Datang",
@@ -135,7 +148,7 @@ class _LoginPageState extends State<PhoneLoginPage>
                     ),
                     Text(
                       "Masukkan nomor telepon kamu!",
-                      textAlign: TextAlign.center, // Mengatur teks menjadi rata tengah
+                      textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 10),
                     Form(
@@ -168,11 +181,9 @@ class _LoginPageState extends State<PhoneLoginPage>
                       child: ElevatedButton(
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            bool isRegistered =
-                            await isPhoneNumberRegistered(_phoneController.text);
+                            bool isRegistered = await isPhoneNumberRegistered(_phoneController.text);
                             if (isRegistered) {
-                              SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
+                              SharedPreferences prefs = await SharedPreferences.getInstance();
                               if (_rememberMe) {
                                 await prefs.setBool('phoneRememberMe', true);
                               } else {
@@ -181,8 +192,7 @@ class _LoginPageState extends State<PhoneLoginPage>
 
                               AuthService.sentOtp(
                                 phone: _phoneController.text,
-                                errorStep: () => ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
+                                errorStep: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                   content: Text(
                                     "Error in sending OTP",
                                     style: TextStyle(color: Colors.white),

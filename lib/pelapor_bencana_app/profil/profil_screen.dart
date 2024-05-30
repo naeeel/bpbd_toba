@@ -1,16 +1,16 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:pelaporan_bencana/pelapor_bencana_app/profil/list_akun.dart';
-import 'package:pelaporan_bencana/pelapor_bencana_app/profil/report_history_screen.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/profil/edit_profile_screen.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/profil/report_history_screen.dart';
+import 'package:pelaporan_bencana/model/report_status.dart' as pelaporan_bencana_model;
+import 'dart:io';
 
 class TrainingScreen extends StatefulWidget {
   const TrainingScreen({Key? key, this.animationController}) : super(key: key);
 
   final AnimationController? animationController;
+
   @override
   _TrainingScreenState createState() => _TrainingScreenState();
 }
@@ -19,18 +19,15 @@ class _TrainingScreenState extends State<TrainingScreen> {
   late String _firstName = '';
   late String _lastName = '';
   late String _email = '';
-  late String _photoURL = '';
-  late List<Report> _userReports = [];
+  late List<pelaporan_bencana_model.Report> _userReports = [];
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final CollectionReference _membersCollection = FirebaseFirestore.instance.collection('members');
 
   @override
   void initState() {
     super.initState();
     _getUserData();
-    _getUserReports();
   }
 
   Future<void> _getUserData() async {
@@ -38,19 +35,25 @@ class _TrainingScreenState extends State<TrainingScreen> {
       User? user = _auth.currentUser;
 
       if (user != null) {
-        String userId = user.uid;
+        _email = user.email ?? '';
 
-        DocumentSnapshot documentSnapshot = await _membersCollection.doc(userId).get();
-
-        if (documentSnapshot.exists) {
-          setState(() {
-            _firstName = documentSnapshot.get('firstName') ?? '';
-            _lastName = documentSnapshot.get('lastName') ?? '';
-            _email = documentSnapshot.get('email') ?? '';
-            _photoURL = documentSnapshot.get('photoURL') ?? '';
-          });
+        // Fetch user document by email
+        QuerySnapshot querySnapshot = await _membersCollection.where('email', isEqualTo: _email.trim()).get();
+        if (querySnapshot.docs.isNotEmpty) {
+          DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
+          if (documentSnapshot.exists) {
+            setState(() {
+              _firstName = documentSnapshot.get('firstName') ?? '';
+              _lastName = documentSnapshot.get('lastName') ?? '';
+              _email = documentSnapshot.get('email') ?? '';
+            });
+            print('User data: ${documentSnapshot.data()}');
+            _getUserReports();  // Fetch user reports after getting user data
+          } else {
+            print('Document does not exist for email: $_email');
+          }
         } else {
-          print('Document does not exist');
+          print('No document found for email: $_email');
         }
       }
     } catch (e) {
@@ -60,25 +63,14 @@ class _TrainingScreenState extends State<TrainingScreen> {
 
   Future<void> _getUserReports() async {
     try {
-      User? user = _auth.currentUser;
+      // Use firstName and lastName as userId
+      String userId = "$_firstName $_lastName";
 
-      if (user != null) {
-        String userId = user.uid;
+      List<pelaporan_bencana_model.Report> reports = await pelaporan_bencana_model.Report.fetchReports(userId);
 
-        QuerySnapshot querySnapshot = await _firestore
-            .collection('laporan')
-            .where('userId', isEqualTo: userId)
-            .orderBy('timestamp', descending: true)
-            .get();
-
-        List<Report> reports = querySnapshot.docs
-            .map((doc) => Report.fromSnapshot(doc))
-            .toList();
-
-        setState(() {
-          _userReports = reports;
-        });
-      }
+      setState(() {
+        _userReports = reports;
+      });
     } catch (e) {
       print('Error fetching user reports: $e');
     }
@@ -98,41 +90,9 @@ class _TrainingScreenState extends State<TrainingScreen> {
     await _getUserReports();
   }
 
-  Future<void> _updateProfilePicture(File imageFile) async {
-    try {
-      User? user = _auth.currentUser;
-
-      if (user != null) {
-        String userId = user.uid;
-
-        // Upload image to Firestore storage or any other storage service
-        // and get the download URL
-        String imageURL = await uploadImageAndGetURL(imageFile);
-
-        // Update profile photo URL in Firestore with the new imageURL
-        await _firestore.collection('members').doc(userId).update({
-          'photoURL': imageURL,
-        });
-
-        // Update _photoURL with the new imageURL
-        setState(() {
-          _photoURL = imageURL;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Profile picture updated successfully!'),
-          ),
-        );
-      }
-    } catch (e) {
-      print('Error updating profile picture: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to update profile picture. Please try again.'),
-        ),
-      );
-    }
+  void _updateProfilePicture(File image) {
+    // Placeholder function to handle profile picture update
+    print("Profile picture updated: $image");
   }
 
   @override
@@ -155,9 +115,7 @@ class _TrainingScreenState extends State<TrainingScreen> {
                 SizedBox(height: 16),
                 CircleAvatar(
                   radius: 60,
-                  backgroundImage: _photoURL.isNotEmpty
-                      ? NetworkImage(_photoURL)
-                      : AssetImage('assets/images/profile_picture.jpg') as ImageProvider,
+                  child: Icon(Icons.person, size: 120), // You can replace this with any placeholder icon
                 ),
                 SizedBox(height: 16),
                 Text(
@@ -176,26 +134,6 @@ class _TrainingScreenState extends State<TrainingScreen> {
                     color: Colors.grey,
                   ),
                 ),
-                SizedBox(height: 32),
-                ListTile(
-                  leading: Icon(Icons.edit),
-                  title: Text('Edit Profile'),
-                  onTap: () async {
-                    // Navigate to EditProfileScreen and wait for result
-                    File? newImageFile = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditProfileScreen(updateProfilePicture: _updateProfilePicture),
-                      ),
-                    );
-
-                    // If newImageFile is not null (i.e., user selected a new image)
-                    if (newImageFile != null) {
-                      // Update profile picture
-                      _updateProfilePicture(newImageFile);
-                    }
-                  },
-                ),
                 ListTile(
                   leading: Icon(Icons.history),
                   title: Text('Historis Pelaporan'),
@@ -213,11 +151,17 @@ class _TrainingScreenState extends State<TrainingScreen> {
                 ListTile(
                   leading: Icon(Icons.support),
                   title: Text('Tentang Kami'),
+                ),
+                ListTile(
+                  leading: Icon(Icons.edit),
+                  title: Text('Edit Profile'),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => TentangKamiScreen(),
+                        builder: (context) => EditProfileScreen(
+                          updateProfilePicture: _updateProfilePicture,
+                        ),
                       ),
                     );
                   },
