@@ -1,9 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final void Function(File) updateProfilePicture;
@@ -17,7 +15,6 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   late String _firstName = '';
   late String _lastName = '';
-  late String _photoURL = '';
   TextEditingController _firstNameController = TextEditingController();
   TextEditingController _lastNameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
@@ -32,8 +29,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final CollectionReference _membersCollection = FirebaseFirestore.instance.collection('members');
 
-  final ImagePicker _picker = ImagePicker();
-
   @override
   void initState() {
     super.initState();
@@ -45,91 +40,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       User? user = _auth.currentUser;
 
       if (user != null) {
-        String userId = user.uid;
+        String email = user.email ?? '';
 
-        DocumentSnapshot documentSnapshot = await _membersCollection.doc(userId).get();
+        // Fetch user document by email
+        QuerySnapshot querySnapshot = await _membersCollection.where('email', isEqualTo: email.trim()).get();
+        if (querySnapshot.docs.isNotEmpty) {
+          DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
+          if (documentSnapshot.exists) {
+            setState(() {
+              _firstName = documentSnapshot.get('firstName') ?? '';
+              _lastName = documentSnapshot.get('lastName') ?? '';
+            });
 
-        if (documentSnapshot.exists) {
-          setState(() {
-            _firstName = documentSnapshot.get('firstName') ?? '';
-            _lastName = documentSnapshot.get('lastName') ?? '';
-            _photoURL = documentSnapshot.get('photoURL') ?? '';
-          });
-
-          _firstNameController.text = _firstName;
-          _lastNameController.text = _lastName;
+            _firstNameController.text = _firstName;
+            _lastNameController.text = _lastName;
+          } else {
+            print('Document does not exist for email: $email');
+          }
         } else {
-          print('Document does not exist');
+          print('No document found for email: $email');
         }
+      } else {
+        print('No authenticated user found.');
       }
     } catch (e) {
       print('Error fetching user data: $e');
-    }
-  }
-
-  Future<void> _updateProfilePicture(File imageFile) async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      User? user = _auth.currentUser;
-
-      if (user != null) {
-        String userId = user.uid;
-
-        String imageURL = await uploadImageAndGetURL(imageFile);
-
-        await _firestore.collection('members').doc(userId).update({
-          'photoURL': imageURL,
-        });
-
-        setState(() {
-          _photoURL = imageURL;
-          _isLoading = false;
-        });
-
-        widget.updateProfilePicture(imageFile);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Profile picture updated successfully!'),
-          ),
-        );
-      }
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-
-      print('Error updating profile picture: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to update profile picture. Please try again.'),
-        ),
-      );
-    }
-  }
-
-  Future<void> _getImageFromGallery() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      File imageFile = File(pickedFile.path);
-      _updateProfilePicture(imageFile);
-    } else {
-      print('No image selected.');
-    }
-  }
-
-  Future<void> _captureImageFromCamera() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
-
-    if (pickedFile != null) {
-      File imageFile = File(pickedFile.path);
-      _updateProfilePicture(imageFile);
-    } else {
-      print('No image captured.');
     }
   }
 
@@ -142,23 +77,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       User? user = _auth.currentUser;
 
       if (user != null) {
-        String userId = user.uid;
+        String email = user.email ?? '';
 
-        await _firestore.collection('members').doc(userId).update({
-          'firstName': _firstNameController.text,
-          'lastName': _lastNameController.text,
-          'photoURL': _photoURL,
-        });
+        // Fetch user document by email
+        QuerySnapshot querySnapshot = await _membersCollection.where('email', isEqualTo: email.trim()).get();
+        if (querySnapshot.docs.isNotEmpty) {
+          DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
+          if (documentSnapshot.exists) {
+            String docId = documentSnapshot.id;
 
-        setState(() {
-          _isLoading = false;
-        });
+            await _firestore.collection('members').doc(docId).update({
+              'firstName': _firstNameController.text,
+              'lastName': _lastNameController.text,
+            });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Profile updated successfully!'),
-          ),
-        );
+            setState(() {
+              _isLoading = false;
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Profile updated successfully!'),
+              ),
+            );
+          }
+        }
       }
     } catch (e) {
       setState(() {
@@ -224,27 +167,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Stack(
-                alignment: Alignment.bottomRight,
-                children: [
-                  CircleAvatar(
-                    radius: 60,
-                    backgroundImage: _photoURL.isNotEmpty
-                        ? NetworkImage(_photoURL)
-                        : AssetImage('assets/images/profile_picture.jpg') as ImageProvider,
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.camera_alt),
-                    onPressed: _getImageFromGallery,
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.camera),
-                    onPressed: _captureImageFromCamera,
-                  ),
-                ],
-              ),
-            ),
             SizedBox(height: 16),
             TextFormField(
               controller: _firstNameController,
@@ -280,7 +202,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 labelText: 'Current Password',
                 prefixIcon: Icon(Icons.lock),
                 suffixIcon: IconButton(
-                  icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+                  icon: Icon(
+                    _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  ),
                   onPressed: () {
                     setState(() {
                       _isPasswordVisible = !_isPasswordVisible;
@@ -303,7 +227,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 labelText: 'New Password',
                 prefixIcon: Icon(Icons.lock_open),
                 suffixIcon: IconButton(
-                  icon: Icon(_isNewPasswordVisible ? Icons.visibility : Icons.visibility_off),
+                  icon: Icon(
+                    _isNewPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  ),
                   onPressed: () {
                     setState(() {
                       _isNewPasswordVisible = !_isNewPasswordVisible;
@@ -326,7 +252,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 labelText: 'Confirm Password',
                 prefixIcon: Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
-                  icon: Icon(_isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off),
+                  icon: Icon(
+                    _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  ),
                   onPressed: () {
                     setState(() {
                       _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
@@ -361,10 +289,4 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
   }
-}
-
-Future<String> uploadImageAndGetURL(File imageFile) async {
-  // Add your image upload logic here
-  // Return the download URL of the uploaded image
-  return ''; // Return empty string as default value
 }

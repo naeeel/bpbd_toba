@@ -6,8 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:pelaporan_bencana/pelapor_bencana_app/Lapor/location_picker_map.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' show LatLng;
+import 'package:pelaporan_bencana/pelapor_bencana_app/Lapor/location_picker_map.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -287,12 +287,10 @@ class _LaporPageState extends State<LaporPage> {
       // Get the current user
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        print('Current user ID: ${user.uid}'); // Tambahkan pesan debug
-
-        // Cari dokumen pengguna berdasarkan UID
+        // Cari dokumen pengguna berdasarkan email
         final userQuerySnapshot = await FirebaseFirestore.instance
             .collection('members')
-            .where('uid', isEqualTo: user.uid)
+            .where('email', isEqualTo: user.email)
             .get();
 
         if (userQuerySnapshot.docs.isNotEmpty) {
@@ -304,7 +302,7 @@ class _LaporPageState extends State<LaporPage> {
           final lastName = userData['lastName'] as String;
 
           // Combine firstName and lastName to create userId
-          final userId = '$firstName $lastName';
+          final userId = '$firstName$lastName';
 
           // Add report data to Firestore
           await FirebaseFirestore.instance.collection('laporan').add({
@@ -335,7 +333,7 @@ class _LaporPageState extends State<LaporPage> {
             ),
           );
         } else {
-          print('User data not found in Firestore for userId: ${user.uid}');
+          print('User data not found in Firestore for email: ${user.email}');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -381,6 +379,7 @@ class _LaporPageState extends State<LaporPage> {
       });
     }
   }
+
 
   void _showDisasterPicker(BuildContext context) {
     showCupertinoModalPopup(
