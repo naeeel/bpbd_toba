@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'design_petugas_app_theme.dart';
+import 'models/category.dart';
 
 class LaporanInfoScreen extends StatefulWidget {
+  final String categoryId;
+
+  const LaporanInfoScreen({Key? key, required this.categoryId}) : super(key: key);
+
   @override
   _LaporanInfoScreenState createState() => _LaporanInfoScreenState();
 }
 
-class _LaporanInfoScreenState extends State<LaporanInfoScreen>
-    with TickerProviderStateMixin {
+class _LaporanInfoScreenState extends State<LaporanInfoScreen> with TickerProviderStateMixin {
   final double infoHeight = 364.0;
   AnimationController? animationController;
   Animation<double>? animation;
@@ -18,6 +24,10 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen>
   bool isImageExpanded = false;
   String selectedImagePath = '';
 
+  Category? category;
+  String? userName;
+  String? location;
+
   @override
   void initState() {
     animationController = AnimationController(
@@ -26,6 +36,7 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen>
         parent: animationController!,
         curve: Interval(0, 1.0, curve: Curves.fastOutSlowIn)));
     setData();
+    fetchCategoryData();
     super.initState();
   }
 
@@ -45,6 +56,36 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen>
     });
   }
 
+  Future<void> fetchCategoryData() async {
+    DocumentSnapshot categorySnapshot = await FirebaseFirestore.instance
+        .collection('categories')
+        .doc(widget.categoryId)
+        .get();
+
+    if (categorySnapshot.exists) {
+      setState(() {
+        category = Category.fromFirestore(categorySnapshot);
+      });
+
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(category!.userId)
+          .get();
+
+      if (userSnapshot.exists) {
+        setState(() {
+          userName = userSnapshot['name'];
+          location = userSnapshot['location'];
+        });
+      }
+    }
+  }
+
+  String formatDate(int timestamp) {
+    var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    return DateFormat.yMMMMd().format(date);
+  }
+
   @override
   Widget build(BuildContext context) {
     final double tempHeight = MediaQuery.of(context).size.height -
@@ -61,10 +102,15 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen>
                 Expanded(
                   child: AspectRatio(
                     aspectRatio: 1.2,
-                    child: Image.asset(
-                      'assets/design_course/banjir.jpg',
-                      fit: BoxFit.cover,
-                    ),
+                    child: category != null
+                        ? Image.network(
+                            category!.imagePath,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.asset(
+                            'assets/design_course/banjir.jpg',
+                            fit: BoxFit.cover,
+                          ),
                   ),
                 ),
               ],
@@ -104,7 +150,9 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen>
                             padding: const EdgeInsets.only(
                                 top: 32.0, left: 18, right: 16),
                             child: Text(
-                              'Bencana\nBanjir',
+                              category != null
+                                  ? category!.disasterType
+                                  : 'Bencana',
                               textAlign: TextAlign.left,
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
@@ -122,7 +170,9 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen>
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 Text(
-                                  '28 Mei 2024', // Ubah string ini sesuai dengan tanggal yang ingin ditampilkan
+                                  category != null
+                                      ? formatDate(category!.timestamp)
+                                      : 'Tanggal',
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w200,
@@ -132,53 +182,39 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen>
                                   ),
                                 ),
                                 Container(
-                                    child: Row(
-                                      children: <Widget>[
-                                        Text(
-                                          'Status',
-                                          textAlign: TextAlign.left,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w200,
-                                            fontSize: 22,
-                                            letterSpacing: 0.27,
-                                            color: DesignPetugasAppTheme.grey,
-                                          ),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Text(
+                                        'Status',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w200,
+                                          fontSize: 22,
+                                          letterSpacing: 0.27,
+                                          color: DesignPetugasAppTheme.grey,
                                         ),
-                                        SizedBox(width: 10), 
-                                        Icon(
-                                          Icons.hourglass_bottom, 
-                                          color: DesignPetugasAppTheme.nearlyBPBD,
-                                          size: 24,
-                                        ),
-                                        SizedBox(width: 10), 
-                                        Icon(
-                                          Icons.check_circle,
-                                          color: Colors.green,
-                                          size: 24,
-                                        ),
-                                        SizedBox(width: 10), 
-                                        Icon(
-                                          Icons.cancel, 
-                                          color: Colors.red,
-                                          size: 24,
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Icon(
+                                        Icons.hourglass_bottom,
+                                        color: DesignPetugasAppTheme.nearlyBPBD,
+                                        size: 24,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Icon(
+                                        Icons.check_circle,
+                                        color: Colors.green,
+                                        size: 24,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Icon(
+                                        Icons.cancel,
+                                        color: Colors.red,
+                                        size: 24,
+                                      ),
+                                    ],
                                   ),
-
-                                        // Icon(
-                                        //   _approvalStatus == ApprovalStatus.waiting
-                                        //       ? Icons.hourglass_bottom // Ikon menunggu persetujuan
-                                        //       : _approvalStatus == ApprovalStatus.approved
-                                        //           ? Icons.check_circle // Ikon disetujui
-                                        //           : Icons.cancel, // Ikon ditolak
-                                        //   color: _approvalStatus == ApprovalStatus.waiting
-                                        //       ? DesignPetugasAppTheme.nearlyBPBD
-                                        //       : _approvalStatus == ApprovalStatus.approved
-                                        //           ? Colors.green
-                                        //           : Colors.red,
-                                        //   size: 24,
-                                        // ),
+                                ),
                               ],
                             ),
                           ),
@@ -189,195 +225,126 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen>
                               padding: const EdgeInsets.all(8),
                               child: Row(
                                 children: <Widget>[
-                                  getTimeBoxUI('Lyra', 'Lyra'),
-                                  getTimeBoxUI('Lokasi', 'Balige'),
+                                  getTimeBoxUI('Pengguna', userName ?? 'Loading...'),
+                                  getTimeBoxUI('Lokasi', location ?? 'Loading...'),
                                   getTimeBoxUI('Status', 'Seat'),
                                 ],
                               ),
                             ),
                           ),
                           Expanded(
-  child: Center(
-    child: SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 16.0), // Tambahkan jarak di sini
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  isImageExpanded = true;
-                  selectedImagePath = 'assets/design_course/banjir.jpg';
-                });
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    fullscreenDialog: true,
-                    transitionDuration: Duration(milliseconds: 500),
-                    pageBuilder: (_, __, ___) => _buildImageDetailPage(),
-                  ),
-                );
-              },
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 500),
-                opacity: opacity1,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.asset(
-                      'assets/design_course/banjir.jpg',
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(width: 8), // Tambahkan jarak antara gambar pertama dan kedua
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  isImageExpanded = true;
-                  selectedImagePath = 'assets/design_course/banjir.jpg';
-                });
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    fullscreenDialog: true,
-                    transitionDuration: Duration(milliseconds: 500),
-                    pageBuilder: (_, __, ___) => _buildImageDetailPage(),
-                  ),
-                );
-              },
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 500),
-                opacity: opacity1,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.asset(
-                      'assets/design_course/banjir.jpg',
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  ),
-),
-
-                          SizedBox(height: 10),
-                          Expanded(
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.vertical,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                child: AnimatedOpacity(
-                                  duration: const Duration(milliseconds: 500),
-                                  opacity: opacity2,
-                                  child: Text(
-                                    ' Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum..',
-                                    textAlign: TextAlign.justify,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w200,
-                                      fontSize: 14,
-                                      letterSpacing: 0.27,
-                                      color: DesignPetugasAppTheme.grey,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          AnimatedOpacity(
-                            duration: const Duration(milliseconds: 500),
-                            opacity: opacity3,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 16, bottom: 16, right: 16),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Container(
-                                    width: 48,
-                                    height: 48,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: DesignPetugasAppTheme.nearlyWhite,
-                                        borderRadius: const BorderRadius.all(
-                                          Radius.circular(16.0),
-                                        ),
-                                        border: Border.all(
-                                            color: DesignPetugasAppTheme.grey
-                                                .withOpacity(0.2)),
-                                      ),
-                                      child: Icon(
-                                        Icons.add,
-                                        color: DesignPetugasAppTheme.nearlyBPBD,
-                                        size: 28,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 16,
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      height: 48,
-                                      decoration: BoxDecoration(
-                                        color: DesignPetugasAppTheme.nearlyBPBD,
-                                        borderRadius: const BorderRadius.all(
-                                          Radius.circular(16.0),
-                                        ),
-                                        boxShadow: <BoxShadow>[
-                                          BoxShadow(
-                                              color: DesignPetugasAppTheme
-                                                  .nearlyBPBD
-                                                  .withOpacity(0.5),
-                                              offset: const Offset(1.1, 1.1),
-                                              blurRadius: 10.0),
-                                        ],
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'apa apa je la',
-                                          textAlign: TextAlign.left,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 18,
-                                            letterSpacing: 0.0,
-                                            color: DesignPetugasAppTheme
-                                                .nearlyWhite,
+                            child: Center(
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            isImageExpanded = true;
+                                            selectedImagePath = category != null
+                                                ? category!.imagePath
+                                                : 'assets/design_course/banjir.jpg';
+                                          });
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              fullscreenDialog: true,
+                                              transitionDuration:
+                                                  Duration(milliseconds: 500),
+                                              pageBuilder: (_, __, ___) =>
+                                                  _buildImageDetailPage(),
+                                            ),
+                                          );
+                                        },
+                                        child: AnimatedOpacity(
+                                          duration:
+                                              const Duration(milliseconds: 500),
+                                          opacity: opacity1,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.3),
+                                                  blurRadius: 10,
+                                                  offset: Offset(0, 4),
+                                                ),
+                                              ],
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              child: category != null
+                                                  ? Image.network(
+                                                      category!.imagePath,
+                                                    )
+                                                  : Image.asset(
+                                                      'assets/design_course/banjir.jpg',
+                                                    ),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  )
-                                ],
+                                      SizedBox(width: 8),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            isImageExpanded = true;
+                                            selectedImagePath = category != null
+                                                ? category!.imagePath
+                                                : 'assets/design_course/banjir.jpg';
+                                          });
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              fullscreenDialog: true,
+                                              transitionDuration:
+                                                  Duration(milliseconds: 500),
+                                              pageBuilder: (_, __, ___) =>
+                                                  _buildImageDetailPage(),
+                                            ),
+                                          );
+                                        },
+                                        child: AnimatedOpacity(
+                                          duration:
+                                              const Duration(milliseconds: 500),
+                                          opacity: opacity1,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.3),
+                                                  blurRadius: 10,
+                                                  offset: Offset(0, 4),
+                                                ),
+                                              ],
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              child: category != null
+                                                  ? Image.network(
+                                                      category!.imagePath,
+                                                    )
+                                                  : Image.asset(
+                                                      'assets/design_course/banjir.jpg',
+                                                    ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -391,62 +358,17 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen>
                 ),
               ),
             ),
-           Positioned(
-  top: (MediaQuery.of(context).size.width / 1.2) - 24.0 - 35,
-  right: 35,
-  child: Row(
-    children: [
-      Card(
-        color: DesignPetugasAppTheme.nearlyBPBD,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50.0),
-        ),
-        elevation: 10.0,
-        child: Container(
-          width: 60,
-          height: 60,
-          child: Center(
-            child: Icon(
-              Icons.close, // Ikon menolak
-              color: DesignPetugasAppTheme.nearlyWhite,
-              size: 30,
-            ),
-          ),
-        ),
-      ),
-      SizedBox(width: 10), // Jarak antara kedua ikon
-      Card(
-        color: Colors.green, // Warna untuk ikon disetujui
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50.0),
-        ),
-        elevation: 10.0,
-        child: Container(
-          width: 60,
-          height: 60,
-          child: Center(
-            child: Icon(
-              Icons.check, // Ikon disetujui
-              color: Colors.white,
-              size: 30,
-            ),
-          ),
-        ),
-      ),
-    ],
-  ),
-),
-
             Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top, left: 8),
               child: SizedBox(
                 width: AppBar().preferredSize.height,
                 height: AppBar().preferredSize.height,
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    borderRadius:
-                        BorderRadius.circular(AppBar().preferredSize.height),
+                    borderRadius: BorderRadius.circular(
+                        AppBar().preferredSize.height),
                     child: Icon(
                       Icons.arrow_back_ios,
                       color: DesignPetugasAppTheme.nearlyBlack,
@@ -463,90 +385,52 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen>
       ),
     );
   }
-  Widget getTimeBoxUI(String text1, String txt2) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: DesignPetugasAppTheme.nearlyWhite,
-          borderRadius: const BorderRadius.all(Radius.circular(16.0)),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-                color: DesignPetugasAppTheme.grey.withOpacity(0.2),
-                offset: const Offset(1.1, 1.1),
-                blurRadius: 8.0),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(
-              left: 18.0, right: 18.0, top: 12.0, bottom: 12.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                text1,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                  letterSpacing: 0.27,
-                  color: DesignPetugasAppTheme.nearlyBPBD,
-                ),
-              ),
-              Text(
-                txt2,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.w200,
-                  fontSize: 14,
-                  letterSpacing: 0.27,
-                  color: DesignPetugasAppTheme.grey,
-                ),
-              ),
-            ],
+
+  Widget getTimeBoxUI(String label, String value) {
+    return Expanded(
+      child: Column(
+        children: <Widget>[
+          Text(
+            value,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              letterSpacing: 0.27,
+              color: DesignPetugasAppTheme.nearlyBPBD,
+            ),
+          ),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.w200,
+              fontSize: 14,
+              letterSpacing: 0.27,
+              color: DesignPetugasAppTheme.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageDetailPage() {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
+      backgroundColor: Colors.black,
+      body: Center(
+        child: Hero(
+          tag: 'imageHero',
+          child: Image.network(
+            selectedImagePath,
+            fit: BoxFit.contain,
           ),
         ),
       ),
     );
   }
-Widget _buildImageDetailPage() {
-  return Scaffold(
-    body: GestureDetector(
-      onTap: () {
-        Navigator.pop(context); // Kembali ke layar sebelumnya jika latar belakang ditekan
-      },
-      child: Container(
-        color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.5), // Latar belakang transparan dengan opasitas 0.5
-        child: Center(
-          child: Hero(
-            tag: 'imageHero',
-            child: Container(
-              margin: EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color.fromARGB(255, 0, 0, 0).withOpacity(0.3),
-                    spreadRadius: 1,
-                    blurRadius: 10,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.asset(
-                  selectedImagePath,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
 }
