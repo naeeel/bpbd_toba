@@ -351,8 +351,5 @@ enum CategoryType {
   angin,
   tsunami,
   lainnya,
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> ec8814228c75f3434a81c050f3bddfa8373488ae
+

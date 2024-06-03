@@ -37,6 +37,9 @@ dependencies:
     shared_preferences: ^2.2.3
     firebase_storage: ^11.7.4
     provider: ^6.1.2
+    timezone: ^0.9.3
+    location: ^6.0.2
+    firebase_app_check: ^0.2.2+7
 
 dev_dependencies:
     flutter_test:

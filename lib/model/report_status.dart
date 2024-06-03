@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
-// Define the ReportStatus enum and Report class
 enum ReportStatus { sent, inProgress, completed, rejected }
 
 class Report {
@@ -72,94 +71,10 @@ class Report {
           .where('userId', isEqualTo: userId)
           .orderBy('timestamp', descending: true)
           .get();
-
       return querySnapshot.docs.map((doc) => Report.fromSnapshot(doc)).toList();
     } catch (e) {
       print('Error fetching user reports: $e');
       return [];
     }
   }
-}
-
-// Define the ReportHistoryScreen widget
-class ReportHistoryScreen extends StatelessWidget {
-  final List<Report> userReports;
-
-  ReportHistoryScreen({required this.userReports});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Historis Pelaporan'),
-      ),
-      body: userReports.isEmpty
-          ? Center(child: Text('Belum ada laporan yang dikirim.'))
-          : ListView.builder(
-        itemCount: userReports.length,
-        itemBuilder: (context, index) {
-          final report = userReports[index];
-          return Card(
-            margin: EdgeInsets.all(10),
-            child: ListTile(
-              leading: report.getStatusIcon(),
-              title: Text(report.disasterType),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(report.keterangan),
-                  Text(
-                      'Lokasi: ${report.latitude}, ${report.longitude}'),
-                  Text('Waktu: ${report.getFormattedTimestamp()}'),
-                ],
-              ),
-              trailing: Icon(Icons.arrow_forward),
-              onTap: () {
-                // Optionally, implement navigation to a detailed report screen
-              },
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-// Define the StatefulWidget to fetch user reports
-class ReportHistoryPage extends StatefulWidget {
-  final String userId;
-
-  ReportHistoryPage({required this.userId});
-
-  @override
-  _ReportHistoryPageState createState() => _ReportHistoryPageState();
-}
-
-class _ReportHistoryPageState extends State<ReportHistoryPage> {
-  List<Report> _userReports = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUserReports();
-  }
-
-  Future<void> _fetchUserReports() async {
-    List<Report> reports = await Report.fetchReports(widget.userId);
-    setState(() {
-      _userReports = reports;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ReportHistoryScreen(userReports: _userReports);
-  }
-}
-
-// Usage:
-void main() {
-  runApp(MaterialApp(
-    home: ReportHistoryPage(userId: 'user123'), // Replace 'user123' with actual userId
-  ));
 }

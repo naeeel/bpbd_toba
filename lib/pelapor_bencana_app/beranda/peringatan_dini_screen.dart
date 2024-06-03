@@ -2,7 +2,6 @@ import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/laporan_masyarakat
 import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/bencana_terkini_view.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/title_view.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_theme.dart';
-import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/mitigasi_list_view.dart';
 import 'package:flutter/material.dart';
 class MyDiaryScreen extends StatefulWidget {
   const MyDiaryScreen({Key? key, this.animationController}) : super(key: key);
@@ -59,7 +58,7 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
     listViews.add(
       TitleView(
         titleTxt: 'Peringatan Dini',
-      
+
         animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
             parent: widget.animationController!,
             curve:
@@ -207,8 +206,8 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
                                 ),
                               ),
                             ),
-                        
-                          
+
+
                           ],
                         ),
                       )

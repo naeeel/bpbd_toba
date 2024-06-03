@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pelaporan_bencana/model/report_status.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/profil/edit_profile_screen.dart';
-import 'package:pelaporan_bencana/pelapor_bencana_app/profil/report_history_screen.dart';
-import 'package:pelaporan_bencana/model/report_status.dart' as pelaporan_bencana_model;
+import 'report_history_screen.dart';
 import 'dart:io';
 
 class TrainingScreen extends StatefulWidget {
@@ -19,7 +19,7 @@ class _TrainingScreenState extends State<TrainingScreen> {
   late String _firstName = '';
   late String _lastName = '';
   late String _email = '';
-  late List<pelaporan_bencana_model.Report> _userReports = [];
+  late List<Report> _userReports = [];
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final CollectionReference _membersCollection = FirebaseFirestore.instance.collection('members');
@@ -47,7 +47,6 @@ class _TrainingScreenState extends State<TrainingScreen> {
               _lastName = documentSnapshot.get('lastName') ?? '';
               _email = documentSnapshot.get('email') ?? '';
             });
-            print('User data: ${documentSnapshot.data()}');
             _getUserReports();  // Fetch user reports after getting user data
           } else {
             print('Document does not exist for email: $_email');
@@ -63,14 +62,18 @@ class _TrainingScreenState extends State<TrainingScreen> {
 
   Future<void> _getUserReports() async {
     try {
-      // Use firstName and lastName as userId
-      String userId = "$_firstName $_lastName";
+      // Use uid as userId
+      User? user = _auth.currentUser;
 
-      List<pelaporan_bencana_model.Report> reports = await pelaporan_bencana_model.Report.fetchReports(userId);
+      if (user != null) {
+        String userId = user.uid;
 
-      setState(() {
-        _userReports = reports;
-      });
+        List<Report> reports = await Report.fetchReports(userId);
+
+        setState(() {
+          _userReports = reports;
+        });
+      }
     } catch (e) {
       print('Error fetching user reports: $e');
     }
@@ -182,10 +185,4 @@ class _TrainingScreenState extends State<TrainingScreen> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: TrainingScreen(),
-  ));
 }
