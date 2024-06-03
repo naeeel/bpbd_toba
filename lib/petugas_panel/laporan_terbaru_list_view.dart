@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pelaporan_bencana/petugas_panel/design_petugas_app_theme.dart';
-import 'package:pelaporan_bencana/petugas_panel/models/category.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';  // Impor ditambahkan
+import 'package:pelaporan_bencana/petugas_panel/models/Category.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pelaporan_bencana/main.dart';
+import 'package:pelaporan_bencana/petugas_panel/laporan_info_screen.dart';
+
 class LaporanTerbaruListView extends StatefulWidget {
-  const LaporanTerbaruListView({Key? key, this.callBack}) : super(key: key);
+ const LaporanTerbaruListView({Key? key, this.callBack}) : super(key: key);
 
-  final Function()? callBack;
-
+  final Function(Category)? callBack;
+  
   @override
   _LaporanTerbaruListViewState createState() => _LaporanTerbaruListViewState();
 }
@@ -26,16 +28,36 @@ class _LaporanTerbaruListViewState extends State<LaporanTerbaruListView>
     super.initState();
   }
 
-  Future<bool> getData() async {
-    await Future<dynamic>.delayed(const Duration(milliseconds: 50));
-    return true;
-  }
-
   @override
   void dispose() {
     animationController?.dispose();
     super.dispose();
   }
+  
+
+
+void moveTo(Category category) {
+  // Assuming category.location is a GeoPoint
+  String locationString =
+      "${category.location.latitude}, ${category.location.longitude}";
+  String formattedTimestamp =
+      DateFormat('dd MMM yyyy, hh:mm a').format(category.timestamp.toDate());
+
+  Navigator.push<dynamic>(
+    context,
+    MaterialPageRoute<dynamic>(
+      builder: (BuildContext context) => LaporanInfoScreen(
+        id: category.id,
+        description: category.description,
+        disasterType: category.disasterType,
+        imageUrl: category.imageUrl,
+        location: locationString, // Pass the converted string here
+        timestamp: formattedTimestamp, // Pass the formatted timestamp here
+        userId: category.userId,
+      ),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -44,62 +66,52 @@ class _LaporanTerbaruListViewState extends State<LaporanTerbaruListView>
       child: Container(
         height: 134,
         width: double.infinity,
-        child: FutureBuilder<bool>(
-          future: getData(),
-          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-            if (!snapshot.hasData) {
-              return const SizedBox();
+        child: StreamBuilder<List<Category>>(
+          stream: CategoryService().getCategoriesStream(),
+          builder: (context, AsyncSnapshot<List<Category>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(
+                child: Text('No data available'),
+              );
             } else {
-              return StreamBuilder<List<Category>>(
-                stream: CategoryService().getCategoriesStream(),
-                builder: (context, AsyncSnapshot<List<Category>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(
-                      child: Text('No data available'),
-                    );
-                  } else {
-                    List<Category> categories = snapshot.data!;
+              List<Category> categories = snapshot.data!;
 
-                    return ListView.builder(
-                      padding: const EdgeInsets.only(
-                        top: 0,
-                        bottom: 0,
-                        right: 16,
-                        left: 16,
+              return ListView.builder(
+                padding: const EdgeInsets.only(
+                  top: 0,
+                  bottom: 0,
+                  right: 16,
+                  left: 16,
+                ),
+                itemCount: categories.length,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index) {
+                  final int count =
+                      categories.length > 10 ? 10 : categories.length;
+                  final Animation<double> animation =
+                      Tween<double>(begin: 0.0, end: 1.0).animate(
+                    CurvedAnimation(
+                      parent: animationController!,
+                      curve: Interval(
+                        (1 / count) * index,
+                        1.0,
+                        curve: Curves.fastOutSlowIn,
                       ),
-                      itemCount: categories.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (BuildContext context, int index) {
-                        final int count = categories.length > 10
-                            ? 10
-                            : categories.length;
-                        final Animation<double> animation =
-                            Tween<double>(begin: 0.0, end: 1.0).animate(
-                          CurvedAnimation(
-                            parent: animationController!,
-                            curve: Interval(
-                              (1 / count) * index,
-                              1.0,
-                              curve: Curves.fastOutSlowIn,
-                            ),
-                          ),
-                        );
-                        animationController?.forward();
+                    ),
+                  );
+                  animationController?.forward();
 
-                        return CategoryView(
-                          category: categories[index],
-                          animation: animation,
-                          animationController: animationController,
-                          callback: widget.callBack,
-                        );
-                      },
-                    );
-                  }
+                  return CategoryView(
+                    category: categories[index],
+                    animation: animation,
+                    animationController: animationController,
+                    callback: () => moveTo(categories[index]),
+                  );
                 },
               );
             }
@@ -124,9 +136,9 @@ class CategoryView extends StatelessWidget {
   final AnimationController? animationController;
   final Animation<double>? animation;
 
-  String formatDate(int timestamp) {
-    var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    return DateFormat.yMMMMd().format(date);
+  String formatDate(Timestamp timestamp) {
+    DateTime date = timestamp.toDate();
+    return DateFormat('dd MMM yyyy, hh:mm a').format(date);
   }
 
   @override
@@ -175,7 +187,9 @@ class CategoryView extends StatelessWidget {
                                             CrossAxisAlignment.start,
                                         children: <Widget>[
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 14),
+                                            padding: const EdgeInsets.only(
+                                              top: 14,
+                                            ),
                                             child: Text(
                                               category!.disasterType,
                                               textAlign: TextAlign.left,
@@ -183,7 +197,8 @@ class CategoryView extends StatelessWidget {
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 16,
                                                 letterSpacing: 0.27,
-                                                color: DesignPetugasAppTheme.darkerText,
+                                                color: DesignPetugasAppTheme
+                                                    .darkerText,
                                               ),
                                             ),
                                           ),
@@ -196,7 +211,7 @@ class CategoryView extends StatelessWidget {
                                               bottom: 8,
                                             ),
                                             child: Text(
-                                              category!.keterangan,
+                                              category!.description,
                                               maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
                                               textAlign: TextAlign.left,
@@ -204,7 +219,8 @@ class CategoryView extends StatelessWidget {
                                                 fontWeight: FontWeight.w200,
                                                 fontSize: 12,
                                                 letterSpacing: 0.27,
-                                                color: DesignPetugasAppTheme.grey,
+                                                color:
+                                                    DesignPetugasAppTheme.grey,
                                               ),
                                             ),
                                           ),
@@ -220,7 +236,8 @@ class CategoryView extends StatelessWidget {
                                                 fontWeight: FontWeight.w200,
                                                 fontSize: 12,
                                                 letterSpacing: 0.27,
-                                                color: DesignPetugasAppTheme.grey,
+                                                color:
+                                                    DesignPetugasAppTheme.grey,
                                               ),
                                             ),
                                           ),
@@ -249,7 +266,7 @@ class CategoryView extends StatelessWidget {
                           child: AspectRatio(
                             aspectRatio: 1.0,
                             child: Image.network(
-                              category!.imagePath,
+                              category!.imageUrl,
                               fit: BoxFit.cover,
                             ),
                           ),

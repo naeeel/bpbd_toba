@@ -1,32 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'design_petugas_app_theme.dart';
-import 'models/category.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LaporanInfoScreen extends StatefulWidget {
-  final String categoryId;
+  final String id;
+  final String description;
+  final String disasterType;
+  final String imageUrl;
+  final String location; // Assuming this is a "latitude,longitude" string
+  final String timestamp;
+  final String userId;
 
-  const LaporanInfoScreen({Key? key, required this.categoryId}) : super(key: key);
+  LaporanInfoScreen({
+    required this.id,
+    required this.description,
+    required this.disasterType,
+    required this.imageUrl,
+    required this.location,
+    required this.timestamp,
+    required this.userId,
+  });
 
   @override
   _LaporanInfoScreenState createState() => _LaporanInfoScreenState();
 }
 
-class _LaporanInfoScreenState extends State<LaporanInfoScreen> with TickerProviderStateMixin {
+class _LaporanInfoScreenState extends State<LaporanInfoScreen>
+    with TickerProviderStateMixin {
   final double infoHeight = 364.0;
   AnimationController? animationController;
   Animation<double>? animation;
   double opacity1 = 0.0;
   double opacity2 = 0.0;
   double opacity3 = 0.0;
-
-  bool isImageExpanded = false;
-  String selectedImagePath = '';
-
-  Category? category;
-  String? userName;
-  String? location;
+  String locationName = 'Loading...';
+  String phoneNumber = '';
 
   @override
   void initState() {
@@ -36,8 +46,9 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen> with TickerProvid
         parent: animationController!,
         curve: Interval(0, 1.0, curve: Curves.fastOutSlowIn)));
     setData();
-    fetchCategoryData();
     super.initState();
+    _getLocationName();
+    _fetchPhoneNumber();
   }
 
   Future<void> setData() async {
@@ -56,34 +67,39 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen> with TickerProvid
     });
   }
 
-  Future<void> fetchCategoryData() async {
-    DocumentSnapshot categorySnapshot = await FirebaseFirestore.instance
-        .collection('categories')
-        .doc(widget.categoryId)
-        .get();
-
-    if (categorySnapshot.exists) {
-      setState(() {
-        category = Category.fromFirestore(categorySnapshot);
-      });
-
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(category!.userId)
-          .get();
-
-      if (userSnapshot.exists) {
+  Future<void> _getLocationName() async {
+    try {
+      final coords = widget.location.split(',');
+      final latitude = double.parse(coords[0]);
+      final longitude = double.parse(coords[1]);
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
+      if (placemarks.isNotEmpty) {
         setState(() {
-          userName = userSnapshot['name'];
-          location = userSnapshot['location'];
+          locationName = placemarks.first.street ?? 'Unknown location';
         });
       }
+    } catch (e) {
+      setState(() {
+        locationName = 'Unknown location';
+      });
     }
   }
 
-  String formatDate(int timestamp) {
-    var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    return DateFormat.yMMMMd().format(date);
+  Future<void> _fetchPhoneNumber() async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance.collection('members').doc(widget.userId).get();
+      if (snapshot.exists) {
+        setState(() {
+          phoneNumber = snapshot.data()!['phone'];
+        });
+      }
+    } catch (e) {
+      setState(() {
+        phoneNumber = 'Phone not available';
+      });
+    }
   }
 
   @override
@@ -99,19 +115,9 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen> with TickerProvid
           children: <Widget>[
             Column(
               children: <Widget>[
-                Expanded(
-                  child: AspectRatio(
-                    aspectRatio: 1.2,
-                    child: category != null
-                        ? Image.network(
-                            category!.imagePath,
-                            fit: BoxFit.cover,
-                          )
-                        : Image.asset(
-                            'assets/design_course/banjir.jpg',
-                            fit: BoxFit.cover,
-                          ),
-                  ),
+                AspectRatio(
+                  aspectRatio: 1.2,
+                  child: Image.network(widget.imageUrl),
                 ),
               ],
             ),
@@ -120,7 +126,7 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen> with TickerProvid
               bottom: 0,
               left: 0,
               right: 0,
-              child: Container(
+              child: SingleChildScrollView(child: Container(
                 decoration: BoxDecoration(
                   color: DesignPetugasAppTheme.nearlyWhite,
                   borderRadius: const BorderRadius.only(
@@ -150,9 +156,7 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen> with TickerProvid
                             padding: const EdgeInsets.only(
                                 top: 32.0, left: 18, right: 16),
                             child: Text(
-                              category != null
-                                  ? category!.disasterType
-                                  : 'Bencana',
+                              'Bencana\n${widget.disasterType}',
                               textAlign: TextAlign.left,
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
@@ -170,51 +174,37 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen> with TickerProvid
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 Text(
-                                  category != null
-                                      ? formatDate(category!.timestamp)
-                                      : 'Tanggal',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w200,
-                                    fontSize: 22,
-                                    letterSpacing: 0.27,
-                                    color: DesignPetugasAppTheme.nearlyBPBD,
-                                  ),
+                                '+62 $phoneNumber',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w200,
+                                  fontSize: 22,
+                                  letterSpacing: 0.27,
+                                  color: DesignPetugasAppTheme.nearlyBPBD,
                                 ),
-                                Container(
-                                  child: Row(
-                                    children: <Widget>[
-                                      Text(
-                                        'Status',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w200,
-                                          fontSize: 22,
-                                          letterSpacing: 0.27,
-                                          color: DesignPetugasAppTheme.grey,
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Icon(
-                                        Icons.hourglass_bottom,
-                                        color: DesignPetugasAppTheme.nearlyBPBD,
-                                        size: 24,
-                                      ),
-                                      SizedBox(width: 10),
-                                      Icon(
-                                        Icons.check_circle,
-                                        color: Colors.green,
-                                        size: 24,
-                                      ),
-                                      SizedBox(width: 10),
-                                      Icon(
-                                        Icons.cancel,
-                                        color: Colors.red,
-                                        size: 24,
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                              ),
+
+                                // Container(
+                                //   child: Row(
+                                //     children: <Widget>[
+                                //       Text(
+                                //         'Hubungi Pelapor',
+                                //         textAlign: TextAlign.left,
+                                //         style: TextStyle(
+                                //           fontWeight: FontWeight.w400,
+                                //           fontSize: 15,
+                                //           // letterSpacing: 0.27,
+                                //           color: DesignPetugasAppTheme.grey,
+                                //         ),
+                                //       ),
+                                //       Icon(
+                                //         Icons.call,
+                                //         color: DesignPetugasAppTheme.nearlyBPBD,
+                                //         size: 34,
+                                //       ),
+                                //     ],
+                                //   ),
+                                // )
                               ],
                             ),
                           ),
@@ -223,128 +213,113 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen> with TickerProvid
                             opacity: opacity1,
                             child: Padding(
                               padding: const EdgeInsets.all(8),
-                              child: Row(
-                                children: <Widget>[
-                                  getTimeBoxUI('Pengguna', userName ?? 'Loading...'),
-                                  getTimeBoxUI('Lokasi', location ?? 'Loading...'),
-                                  getTimeBoxUI('Status', 'Seat'),
-                                ],
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: <Widget>[
+                                    getTimeBoxUI('Pelapor', widget.userId, false),
+                                    getTimeBoxUI('Waktu Tanggal',widget.timestamp, false),
+                                    GestureDetector(onTap: _openMaps,child: getTimeBoxUI('Location', locationName, true),),
+                                    getTimeBoxUI('Status', 'Menunggu', false),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                           Expanded(
-                            child: Center(
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 16.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                            child: AnimatedOpacity(
+                              duration: const Duration(milliseconds: 500),
+                              opacity: opacity2,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            isImageExpanded = true;
-                                            selectedImagePath = category != null
-                                                ? category!.imagePath
-                                                : 'assets/design_course/banjir.jpg';
-                                          });
-                                          Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                              fullscreenDialog: true,
-                                              transitionDuration:
-                                                  Duration(milliseconds: 500),
-                                              pageBuilder: (_, __, ___) =>
-                                                  _buildImageDetailPage(),
-                                            ),
-                                          );
-                                        },
-                                        child: AnimatedOpacity(
-                                          duration:
-                                              const Duration(milliseconds: 500),
-                                          opacity: opacity1,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.3),
-                                                  blurRadius: 10,
-                                                  offset: Offset(0, 4),
-                                                ),
-                                              ],
-                                            ),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              child: category != null
-                                                  ? Image.network(
-                                                      category!.imagePath,
-                                                    )
-                                                  : Image.asset(
-                                                      'assets/design_course/banjir.jpg',
-                                                    ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 8),
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            isImageExpanded = true;
-                                            selectedImagePath = category != null
-                                                ? category!.imagePath
-                                                : 'assets/design_course/banjir.jpg';
-                                          });
-                                          Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                              fullscreenDialog: true,
-                                              transitionDuration:
-                                                  Duration(milliseconds: 500),
-                                              pageBuilder: (_, __, ___) =>
-                                                  _buildImageDetailPage(),
-                                            ),
-                                          );
-                                        },
-                                        child: AnimatedOpacity(
-                                          duration:
-                                              const Duration(milliseconds: 500),
-                                          opacity: opacity1,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.3),
-                                                  blurRadius: 10,
-                                                  offset: Offset(0, 4),
-                                                ),
-                                              ],
-                                            ),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              child: category != null
-                                                  ? Image.network(
-                                                      category!.imagePath,
-                                                    )
-                                                  : Image.asset(
-                                                      'assets/design_course/banjir.jpg',
-                                                    ),
-                                            ),
-                                          ),
+                                      Text(
+                                        widget.description,
+                                        textAlign: TextAlign.justify,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w200,
+                                          fontSize: 14,
+                                          letterSpacing: 0.27,
+                                          color: DesignPetugasAppTheme.grey,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
+                              ),
+                            ),
+                          ),
+                           AnimatedOpacity(
+                            duration: const Duration(milliseconds: 500),
+                            opacity: opacity3,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 16, bottom: 16, right: 16),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    width: 48,
+                                    height: 48,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color:
+                                            DesignPetugasAppTheme.nearlyWhite,
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(16.0),
+                                        ),
+                                        border: Border.all(
+                                            color: DesignPetugasAppTheme.grey
+                                                .withOpacity(0.2)),
+                                      ),
+                                      child: Icon(
+                                        Icons.add,
+                                        color: DesignPetugasAppTheme.nearlyBPBD,
+                                        size: 28,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 16,
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: DesignPetugasAppTheme.nearlyBPBD,
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(16.0),
+                                        ),
+                                        boxShadow: <BoxShadow>[
+                                          BoxShadow(
+                                              color: DesignPetugasAppTheme
+                                                  .nearlyBPBD
+                                                  .withOpacity(0.5),
+                                              offset: const Offset(1.1, 1.1),
+                                              blurRadius: 10.0),
+                                        ],
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'Hubungi Kami',
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 18,
+                                            letterSpacing: 0.0,
+                                            color: DesignPetugasAppTheme
+                                                .nearlyWhite,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
                           ),
@@ -356,22 +331,88 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen> with TickerProvid
                     ),
                   ),
                 ),
+              ),)
+              
+            ),
+            Positioned(
+              top: (MediaQuery.of(context).size.width / 1.2) - 59.0,
+              right: 35,
+              child: ScaleTransition(
+                alignment: Alignment.center,
+                scale: CurvedAnimation(
+                  parent: animationController!,
+                  curve: Curves.fastOutSlowIn,
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      width: 60,
+                      height: 60,
+                      child: Center(
+                        child: Icon(
+                          Icons.call,
+                          color: DesignPetugasAppTheme.nearlyWhite,
+                          size: 30,
+                        ),
+                      ),
+                      decoration: BoxDecoration(
+                        color: DesignPetugasAppTheme.nearlyBPBD,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Container(
+                      width: 60,
+                      height: 60,
+                      child: Center(
+                        child: Icon(
+                          Icons.clear,
+                          color: DesignPetugasAppTheme.nearlyWhite,
+                          size: 30,
+                        ),
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red, // Warna latar belakang untuk tolak
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Container(
+                      width: 60,
+                      height: 60,
+                      child: Center(
+                        child: Icon(
+                          Icons.check,
+                          color: DesignPetugasAppTheme.nearlyWhite,
+                          size: 30,
+                        ),
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.green, // Warna latar belakang untuk terima
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
+
             Padding(
               padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).padding.top, left: 8),
+                  top: MediaQuery.of(context).padding.top + 12,
+                  left: 8,
+                  right: 8),
               child: SizedBox(
                 width: AppBar().preferredSize.height,
                 height: AppBar().preferredSize.height,
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(
-                        AppBar().preferredSize.height),
+                    borderRadius:
+                        BorderRadius.circular(AppBar().preferredSize.height),
                     child: Icon(
                       Icons.arrow_back_ios,
-                      color: DesignPetugasAppTheme.nearlyBlack,
+                      color: DesignPetugasAppTheme.nearlyBPBD,
                     ),
                     onTap: () {
                       Navigator.pop(context);
@@ -386,51 +427,69 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen> with TickerProvid
     );
   }
 
-  Widget getTimeBoxUI(String label, String value) {
-    return Expanded(
-      child: Column(
-        children: <Widget>[
-          Text(
-            value,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-              letterSpacing: 0.27,
-              color: DesignPetugasAppTheme.nearlyBPBD,
-            ),
-          ),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontWeight: FontWeight.w200,
-              fontSize: 14,
-              letterSpacing: 0.27,
-              color: DesignPetugasAppTheme.grey,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildImageDetailPage() {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        iconTheme: IconThemeData(color: Colors.white),
-      ),
-      backgroundColor: Colors.black,
-      body: Center(
-        child: Hero(
-          tag: 'imageHero',
-          child: Image.network(
-            selectedImagePath,
-            fit: BoxFit.contain,
+  Widget getTimeBoxUI(String txt1, String txt2, bool isLocation) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: DesignPetugasAppTheme.nearlyWhite,
+          borderRadius: const BorderRadius.all(Radius.circular(16.0)),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+                color: DesignPetugasAppTheme.grey.withOpacity(0.2),
+                offset: const Offset(1.1, 1.1),
+                blurRadius: 8.0),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(
+              left: 18.0, right: 18.0, top: 12.0, bottom: 12.0),
+          child: Column(
+            children: <Widget>[
+              Text(
+                txt1,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  letterSpacing: 0.27,
+                  color: DesignPetugasAppTheme.nearlyBPBD,
+                ),
+              ),
+              Text(
+                txt2,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w200,
+                  fontSize: 14,
+                  letterSpacing: 0.27,
+                  color: DesignPetugasAppTheme.grey,
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
+
+  void _openMaps() async {
+    final url =
+        'https://www.google.com/maps/dir/?api=1&destination=${Uri.encodeComponent(widget.location)}';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  void _launchPhoneCall(String phoneNumber) async {
+    final url = 'tel:$phoneNumber';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 }
+

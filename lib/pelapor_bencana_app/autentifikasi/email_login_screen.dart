@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_home_screen.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_theme.dart';
 import 'package:pelaporan_bencana/petugas_panel/home_design_laporan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,8 +18,14 @@ class AuthService {
         await prefs.setBool('rememberMe', true);
       }
       return "Success";
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+        return 'Email atau kata sandi salah';
+      } else {
+        return 'Terjadi kesalahan. Silakan coba lagi.';
+      }
     } catch (e) {
-      return e.toString();
+      return 'Terjadi kesalahan. Silakan coba lagi.';
     }
   }
 }
@@ -89,7 +96,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
             SnackBar(
               content: Text(
                 value,
-                style: TextStyle(color: Colors.white),
+                style: PelaporansAppTheme.body2.copyWith(color: Colors.white),
               ),
               backgroundColor: Colors.red,
             ),
@@ -125,53 +132,72 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                     Text(
                       "Selamat Datang",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
+                      style: PelaporansAppTheme.headline.copyWith(
                         fontSize: 32,
-                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.1,
+                        color: PelaporansAppTheme.dark_grey,
                       ),
                     ),
                     Text(
                       "Masukkan email dan password kamu ya!",
                       textAlign: TextAlign.center,
+                      style: PelaporansAppTheme.body2.copyWith(color: PelaporansAppTheme.grey),
                     ),
                     SizedBox(height: 10),
                     Form(
                       key: _formKey,
                       child: Column(
                         children: [
-                          TextFormField(
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              labelText: "Email",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(32),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                            child: TextFormField(
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: InputDecoration(
+                                labelText: "Email",
+                                labelStyle: PelaporansAppTheme.caption.copyWith(color: PelaporansAppTheme.lightText),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  borderSide: BorderSide.none,
+                                ),
                               ),
+                              style: PelaporansAppTheme.body2.copyWith(color: PelaporansAppTheme.grey),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return "Email tidak boleh kosong";
+                                } else if (!value.contains("@")) {
+                                  return "Masukkan alamat email yang benar";
+                                }
+                                return null;
+                              },
                             ),
-                            validator: (value) {
-                              if (value!.isEmpty || !value.contains("@")) {
-                                return "Masukkan alamat email yang benar";
-                              }
-                              return null;
-                            },
                           ),
                           SizedBox(height: 20),
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              labelText: "Kata Sandi",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(32),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                            child: TextFormField(
+                              controller: _passwordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                labelText: "Kata Sandi",
+                                labelStyle: PelaporansAppTheme.caption.copyWith(color: PelaporansAppTheme.lightText),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  borderSide: BorderSide.none,
+                                ),
                               ),
+                              style: PelaporansAppTheme.body2.copyWith(color: PelaporansAppTheme.grey),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return "Kata sandi tidak boleh kosong";
+                                }
+                                return null;
+                              },
                             ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "Masukkan kata sandi yang benar";
-                              }
-                              return null;
-                            },
                           ),
                         ],
                       ),
@@ -188,19 +214,27 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                             });
                           },
                         ),
-                        Text('Ingatkan Saya'),
+                        Text(
+                          'Ingatkan Saya',
+                          style: PelaporansAppTheme.body2,
+                        ),
                       ],
                     ),
                     SizedBox(height: 20),
                     SizedBox(
                       height: 50,
-                      width: double.infinity,
+                      width: MediaQuery.of(context).size.width * 0.8,
                       child: ElevatedButton(
                         onPressed: () => _handleSubmit(context),
-                        child: Text("Masuk"),
+                        child: Text(
+                          "Masuk",
+                          style: PelaporansAppTheme.body2.copyWith(color: PelaporansAppTheme.spacer),
+                        ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFF28920),
-                          foregroundColor: const Color.fromARGB(255, 255, 255, 255),
+                          backgroundColor: PelaporansAppTheme.nearlyBlue,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                         ),
                       ),
                     ),
@@ -210,9 +244,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                       },
                       child: Text(
                         "Lupa Kata Sandi?",
-                        style: TextStyle(
-                          color: Colors.blue,
-                        ),
+                        style: PelaporansAppTheme.body2.copyWith(color: PelaporansAppTheme.nearlyDarkBlue),
                       ),
                     ),
                   ],
@@ -228,6 +260,9 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
 
 void main() {
   runApp(MaterialApp(
+    theme: ThemeData(
+      textTheme: PelaporansAppTheme.textTheme,
+    ),
     home: EmailLoginPage(),
   ));
 }

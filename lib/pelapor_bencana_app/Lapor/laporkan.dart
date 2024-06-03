@@ -241,7 +241,7 @@ class _LaporPageState extends State<LaporPage> {
       ),
     );
 
-    if (pickedLocation != null) {
+    if (pickedLocation != null && mounted) {
       setState(() {
         _selectedLocation = pickedLocation;
       });
@@ -271,23 +271,15 @@ class _LaporPageState extends State<LaporPage> {
     });
 
     try {
-      // Get a reference to the Firebase Storage
-      final storage = FirebaseStorage.instance;
-
-      // Create a reference to the image file
-      final ref = storage.ref().child('images/${DateTime.now()}.jpg');
-
-      // Upload image to Firebase Storage
-      final uploadTask = ref.putFile(_pickedImage!);
-      final snapshot = await uploadTask.whenComplete(() => {});
-
-      // Get the download URL of the uploaded image
-      final imageUrl = await snapshot.ref.getDownloadURL();
-
-      // Get the current user
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        // Cari dokumen pengguna berdasarkan email
+        final storage = FirebaseStorage.instance;
+        final imageId = DateTime.now().millisecondsSinceEpoch.toString(); // Unique ID for the image
+        final ref = storage.ref().child('images/$imageId.jpg');
+        final uploadTask = ref.putFile(_pickedImage!);
+        final snapshot = await uploadTask.whenComplete(() => {});
+        final imageUrl = await snapshot.ref.getDownloadURL();
+
         final userQuerySnapshot = await FirebaseFirestore.instance
             .collection('members')
             .where('email', isEqualTo: user.email)
@@ -296,15 +288,11 @@ class _LaporPageState extends State<LaporPage> {
         if (userQuerySnapshot.docs.isNotEmpty) {
           final userDoc = userQuerySnapshot.docs.first;
           final userData = userDoc.data();
-          print('User data: $userData'); // Tambahkan pesan debug
 
           final firstName = userData['firstName'] as String;
           final lastName = userData['lastName'] as String;
-
-          // Combine firstName and lastName to create userId
           final userId = '$firstName$lastName';
 
-          // Add report data to Firestore
           await FirebaseFirestore.instance.collection('laporan').add({
             'userId': userId,
             'imageUrl': imageUrl,
@@ -314,6 +302,7 @@ class _LaporPageState extends State<LaporPage> {
             'timestamp': FieldValue.serverTimestamp(),
           });
 
+          if (!mounted) return;  // Check if widget is still mounted before updating the state
           setState(() {
             _isDataSent = true;
             _pickedImage = null;
@@ -333,7 +322,6 @@ class _LaporPageState extends State<LaporPage> {
             ),
           );
         } else {
-          print('User data not found in Firestore for email: ${user.email}');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -347,7 +335,6 @@ class _LaporPageState extends State<LaporPage> {
           );
         }
       } else {
-        print('User is not logged in.');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -361,7 +348,6 @@ class _LaporPageState extends State<LaporPage> {
         );
       }
     } catch (error) {
-      print('Error uploading data: $error');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -374,12 +360,12 @@ class _LaporPageState extends State<LaporPage> {
         ),
       );
     } finally {
+      if (!mounted) return;  // Check if widget is still mounted before updating the state
       setState(() {
         _isSending = false;
       });
     }
   }
-
 
   void _showDisasterPicker(BuildContext context) {
     showCupertinoModalPopup(

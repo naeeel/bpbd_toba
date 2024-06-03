@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pelaporan_bencana/petugas_panel/design_petugas_app_theme.dart';
-import 'package:pelaporan_bencana/petugas_panel/models/category.dart';
+import 'package:pelaporan_bencana/petugas_panel/models/Category.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pelaporan_bencana/main.dart';
+import 'package:pelaporan_bencana/petugas_panel/laporan_info_screen.dart';
 
 class LaporanBencanaListView extends StatefulWidget {
   const LaporanBencanaListView({Key? key, this.callBack}) : super(key: key);
 
-  final Function()? callBack;
+  final Function(Category)? callBack;
 
   @override
   _LaporanBencanaListViewState createState() => _LaporanBencanaListViewState();
@@ -14,7 +17,7 @@ class LaporanBencanaListView extends StatefulWidget {
 
 class _LaporanBencanaListViewState extends State<LaporanBencanaListView>
     with TickerProviderStateMixin {
-  late AnimationController animationController;
+  AnimationController? animationController;
 
   @override
   void initState() {
@@ -27,8 +30,30 @@ class _LaporanBencanaListViewState extends State<LaporanBencanaListView>
 
   @override
   void dispose() {
-    animationController.dispose();
+    animationController?.dispose();
     super.dispose();
+  }
+
+  void moveTo(Category category) {
+    String locationString =
+        "${category.location.latitude}, ${category.location.longitude}";
+    String formattedTimestamp =
+        DateFormat('dd MMM yyyy, hh:mm a').format(category.timestamp.toDate());
+
+    Navigator.push<dynamic>(
+      context,
+      MaterialPageRoute<dynamic>(
+        builder: (BuildContext context) => LaporanInfoScreen(
+          id: category.id,
+          description: category.description,
+          disasterType: category.disasterType,
+          imageUrl: category.imageUrl,
+          location: locationString,
+          timestamp: formattedTimestamp,
+          userId: category.userId,
+        ),
+      ),
+    );
   }
 
   @override
@@ -64,14 +89,14 @@ class _LaporanBencanaListViewState extends State<LaporanBencanaListView>
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisSpacing: 32.0,
-                      crossAxisSpacing: 25.0,
+                      crossAxisSpacing: 32.0,
                       childAspectRatio: 0.8,
                     ),
                     itemBuilder: (BuildContext context, int index) {
                       final Animation<double> animation =
                           Tween<double>(begin: 0.0, end: 1.0).animate(
                         CurvedAnimation(
-                          parent: animationController,
+                          parent: animationController!,
                           curve: Interval(
                             (1 / categories.length) * index,
                             1.0,
@@ -79,13 +104,13 @@ class _LaporanBencanaListViewState extends State<LaporanBencanaListView>
                           ),
                         ),
                       );
-                      animationController.forward();
+                      animationController?.forward();
 
                       return CategoryView(
-                        callback: widget.callBack,
+                        callback: () => moveTo(categories[index]),
                         category: categories[index],
                         animation: animation,
-                        animationController: animationController,
+                        animationController: animationController!,
                       );
                     },
                   );
@@ -118,6 +143,11 @@ class CategoryView extends StatelessWidget {
   final AnimationController animationController;
   final Animation<double> animation;
 
+  String formatDate(Timestamp timestamp) {
+    DateTime date = timestamp.toDate();
+    return DateFormat('dd MMM yyyy, hh:mm a').format(date);
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -145,9 +175,10 @@ class CategoryView extends StatelessWidget {
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
+                                color: HexColor('#F8FAFB'),
                                 borderRadius: const BorderRadius.all(
                                     Radius.circular(16.0)),
-                                boxShadow: [
+                                boxShadow: <BoxShadow>[
                                   BoxShadow(
                                     color: Colors.grey.withOpacity(0.5),
                                     spreadRadius: 3,
@@ -158,94 +189,41 @@ class CategoryView extends StatelessWidget {
                               ),
                               child: Column(
                                 children: <Widget>[
-                                  Expanded(
-                                    child: Container(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 16, left: 16, right: 16),
-                                            child: Text(
-                                              category.title,
-                                              textAlign: TextAlign.left,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16,
-                                                letterSpacing: 0.27,
-                                                color: DesignPetugasAppTheme
-                                                    .darkerText,
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 16, bottom: 8),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: <Widget>[
-                                                Expanded(
-                                                  child: Container(
-                                                    margin:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 16),
-                                                    child: Text(
-                                                      category.disasterType,
-                                                      maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      textAlign: TextAlign.left,
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w200,
-                                                        fontSize: 12,
-                                                        letterSpacing: 0.27,
-                                                        color:
-                                                            DesignPetugasAppTheme
-                                                                .grey,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 8,
-                                                left: 16,
-                                                right: 16,
-                                                bottom: 8),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: <Widget>[
-                                                Text(
-                                                  '${category.timestamp.toString()}',
-                                                  textAlign: TextAlign.left,
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w200,
-                                                    fontSize: 12,
-                                                    letterSpacing: 0.27,
-                                                    color: DesignPetugasAppTheme
-                                                        .grey,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 16, left: 16, right: 16),
+                                    child: Text(
+                                      category.disasterType,
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                        letterSpacing: 0.27,
+                                        color: DesignPetugasAppTheme.darkerText,
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 48,
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 8, left: 16, right: 16, bottom: 8),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text(
+                                          formatDate(category.timestamp),
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w200,
+                                            fontSize: 12,
+                                            letterSpacing: 0.27,
+                                            color: DesignPetugasAppTheme.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
@@ -280,7 +258,7 @@ class CategoryView extends StatelessWidget {
                             child: AspectRatio(
                               aspectRatio: 4 / 3,
                               child: Image.network(
-                                category.imagePath,
+                                category.imageUrl,
                                 fit: BoxFit.cover,
                               ),
                             ),
