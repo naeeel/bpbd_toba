@@ -6,6 +6,8 @@ import 'package:pelaporan_bencana/pelapor_bencana_app/profil/report_history_scre
 import 'package:pelaporan_bencana/model/report_status.dart'
     as pelaporan_bencana_model;
 import 'dart:io';
+import 'package:pelaporan_bencana/pelapor_bencana_app/ui_view/foto_pengurus_view.dart';
+
 
 class TrainingScreen extends StatefulWidget {
   const TrainingScreen({Key? key, this.animationController}) : super(key: key);
@@ -158,6 +160,14 @@ class _TrainingScreenState extends State<TrainingScreen> {
                 ListTile(
                   leading: Icon(Icons.support),
                   title: Text('Tentang Kami'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AreaListView(),
+                        ),
+                      );
+                    },
                 ),
                 ListTile(
                   leading: Icon(Icons.edit),
