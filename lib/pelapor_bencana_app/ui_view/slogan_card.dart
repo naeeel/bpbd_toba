@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../pelaporan_bencana_app_theme.dart';
 
-class RunningView extends StatelessWidget {
+class SloganCard extends StatelessWidget {
   final AnimationController? animationController;
   final Animation<double>? animation;
 
-  const RunningView({Key? key, this.animationController, this.animation})
+  const SloganCard({Key? key, this.animationController, this.animation})
       : super(key: key);
 
   @override
@@ -69,7 +69,7 @@ class RunningView extends StatelessWidget {
                                           top: 16,
                                         ),
                                         child: Text(
-                                          "Ayo bantu kami dalam pelaporan!",
+                                          "Ini adalah mitigasi!",
                                           textAlign: TextAlign.left,
                                           style: TextStyle(
                                             fontFamily:
@@ -91,7 +91,7 @@ class RunningView extends StatelessWidget {
                                       right: 16,
                                     ),
                                     child: Text(
-                                      "Ayo lapor kepada pihak yyang bersangkutan\nkhususnya BNPB ya!",
+                                      "Klik gambar maka akan muncul\nmitigasi!",
                                       textAlign: TextAlign.left,
                                       style: TextStyle(
                                         fontFamily: PelaporansAppTheme.fontName,

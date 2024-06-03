@@ -5,13 +5,18 @@ class CategoryService {
       FirebaseFirestore.instance.collection('laporan');
 
   Future<List<Category>> getCategories() async {
-    final QuerySnapshot snapshot = await _categoriesRef.get();
-    return snapshot.docs
-        .map((doc) => Category.fromFirestore(doc))
-        .toList();
+    try {
+      final QuerySnapshot snapshot = await _categoriesRef.get();
+      return snapshot.docs
+          .map((doc) => Category.fromFirestore(doc))
+          .toList();
+    } catch (e) {
+      // Handle error, e.g., print error or return an empty list
+      print('Error getting categories: $e');
+      return [];
+    }
   }
 
-  // Tambahkan metode ini
   Stream<List<Category>> getCategoriesStream() {
     return _categoriesRef.snapshots().map((snapshot) =>
         snapshot.docs.map((doc) => Category.fromFirestore(doc)).toList());
@@ -19,44 +24,35 @@ class CategoryService {
 }
 
 class Category {
-  String title;
-  String imagePath;
-  String description;
-  String disasterType;
-  String keterangan;
-  double latitude;
-  double longitude;
-  String status;
-  int timestamp;
-  String userId;
+  String id;
+  final String description;
+  final String disasterType;
+  final String imageUrl;
+  final GeoPoint location;
+  final Timestamp timestamp;
+  final String userId;
 
   Category({
-    this.title = '',
-    this.imagePath = '',
-    this.description = '',
-    this.disasterType = '',
-    this.keterangan = '',
-    this.latitude = 0.0,
-    this.longitude = 0.0,
-    this.status = '',
-    this.timestamp = 0,
-    this.userId = '',
+    required this.id,
+    required this.description,
+    required this.disasterType,
+    required this.imageUrl,
+    required this.location,
+    required this.timestamp,
+    required this.userId,
   });
 
-  // Rename the method to match the actual implementation
-  static Category fromFirestore(DocumentSnapshot doc) {
-    Map data = doc.data() as Map;
+  factory Category.fromFirestore(DocumentSnapshot snapshot) {
+    var data = snapshot.data() as Map<String, dynamic>;
     return Category(
-      title: data['title'] ?? '',
-      imagePath: data['imagePath'] ?? '',
-      description: data['description'] ?? '',
-      disasterType: data['disasterType'] ?? '',
-      keterangan: data['keterangan'] ?? '',
-      latitude: (data['latitude'] != null) ? data['latitude'].toDouble() : 0.0,
-      longitude: (data['longitude'] != null) ? data['longitude'].toDouble() : 0.0,
-      status: data['status'] ?? '',
-      timestamp: data['timestamp'] ?? 0,
-      userId: data['userId'] ?? '',
+      id: snapshot.id,
+      description: data['description'],
+      disasterType: data['disasterType'],
+      imageUrl: data['imageUrl'],
+      location: data['location'],
+      timestamp: data['timestamp'],
+      userId: data['userId'],
     );
   }
 }
+

@@ -1,9 +1,12 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pelaporan_bencana/main.dart';
+import 'package:pelaporan_bencana/petugas_panel/design_petugas_app_theme.dart';
 import 'package:pelaporan_bencana/petugas_panel/laporan_terbaru_list_view.dart';
 import 'package:pelaporan_bencana/petugas_panel/laporan_info_screen.dart';
+import 'package:pelaporan_bencana/petugas_panel/models/Category.dart';
 import 'package:pelaporan_bencana/petugas_panel/laporan_bencana_list_view.dart';
-import 'package:pelaporan_bencana/main.dart';
-import 'package:flutter/material.dart';
-import 'design_petugas_app_theme.dart';
 
 class DesignCourseHomeScreen extends StatefulWidget {
   @override
@@ -12,6 +15,7 @@ class DesignCourseHomeScreen extends StatefulWidget {
 
 class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
   CategoryType categoryType = CategoryType.gempa;
+
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +38,7 @@ class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
                       getSearchBarUI(),
                       getKategoriUI(),
                       Flexible(
-                        child: getLporanBencanaUI(),
+                        child: getLaporanBencanaUI(),
                       ),
                     ],
                   ),
@@ -55,7 +59,7 @@ class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 15.0, left: 18, right: 16),
           child: Text(
-            'Categori Bencana',
+            'Kategori Bencana',
             textAlign: TextAlign.left,
             style: TextStyle(
               fontWeight: FontWeight.w600,
@@ -118,15 +122,15 @@ class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
           height: 16,
         ),
         LaporanTerbaruListView(
-          callBack: () {
-            // moveTo();
+          callBack: (Category category) {
+            moveTo(category);
           },
         ),
       ],
     );
   }
 
-  Widget getLporanBencanaUI() {
+  Widget getLaporanBencanaUI() {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0, left: 18, right: 16),
       child: Column(
@@ -145,8 +149,8 @@ class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
           ),
           Flexible(
             child: LaporanBencanaListView(
-              callBack: () {
-                // moveTo();
+              callBack: (Category category) {
+                moveTo(category);
               },
             ),
           )
@@ -155,12 +159,27 @@ class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
     );
   }
 
-  void moveTo(int categoryId) {
+  void moveTo(Category category) {
+    // Assuming category.location is a GeoPoint
+    String locationString =
+        "${category.location.latitude}, ${category.location.longitude}";
+
+    // Convert Timestamp to String
+    String formattedTimestamp =
+    DateFormat('dd MMM yyyy, hh:mm a').format(category.timestamp.toDate());
+
     Navigator.push<dynamic>(
       context,
       MaterialPageRoute<dynamic>(
-        builder: (BuildContext context) =>
-            LaporanInfoScreen(categoryId: categoryId.toString()),
+        builder: (BuildContext context) => LaporanInfoScreen(
+          id: category.id,
+          description: category.description,
+          disasterType: category.disasterType,
+          imageUrl: category.imageUrl,
+          location: locationString, // Pass the converted string here
+          timestamp: formattedTimestamp, // Pass the formatted string here
+          userId: category.userId,
+        ),
       ),
     );
   }
@@ -184,14 +203,16 @@ class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
     } else if (CategoryType.lainnya == categoryTypeData) {
       txt = 'lainnya';
     }
+
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
-            color: isSelected
-                ? DesignPetugasAppTheme.nearlyBPBD
-                : DesignPetugasAppTheme.nearlyWhite,
-            borderRadius: const BorderRadius.all(Radius.circular(24.0)),
-            border: Border.all(color: DesignPetugasAppTheme.nearlyBPBD)),
+          color: isSelected
+              ? DesignPetugasAppTheme.nearlyBPBD
+              : DesignPetugasAppTheme.nearlyWhite,
+          borderRadius: const BorderRadius.all(Radius.circular(24.0)),
+          border: Border.all(color: DesignPetugasAppTheme.nearlyBPBD),
+        ),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -334,7 +355,7 @@ class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
           Container(
             width: 60,
             height: 60,
-            child: Image.asset('assets/design_course/userImage.png'),
+            child: Image.asset('assets/introduction_animation/logo.png'),
           )
         ],
       ),
@@ -352,4 +373,3 @@ enum CategoryType {
   tsunami,
   lainnya,
 }
-

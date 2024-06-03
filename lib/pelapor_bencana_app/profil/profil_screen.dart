@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:pelaporan_bencana/model/report_status.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/profil/edit_profile_screen.dart';
-import 'report_history_screen.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/profil/report_history_screen.dart';
+import 'package:pelaporan_bencana/model/report_status.dart'
+as pelaporan_bencana_model;
 import 'dart:io';
+import 'package:pelaporan_bencana/pelapor_bencana_app/ui_view/foto_pengurus_view.dart';
+
 
 class TrainingScreen extends StatefulWidget {
   const TrainingScreen({Key? key, this.animationController}) : super(key: key);
@@ -19,10 +22,11 @@ class _TrainingScreenState extends State<TrainingScreen> {
   late String _firstName = '';
   late String _lastName = '';
   late String _email = '';
-  late List<Report> _userReports = [];
+  late List<pelaporan_bencana_model.Report> _userReports = [];
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final CollectionReference _membersCollection = FirebaseFirestore.instance.collection('members');
+  final CollectionReference _membersCollection =
+  FirebaseFirestore.instance.collection('members');
 
   @override
   void initState() {
@@ -38,7 +42,9 @@ class _TrainingScreenState extends State<TrainingScreen> {
         _email = user.email ?? '';
 
         // Fetch user document by email
-        QuerySnapshot querySnapshot = await _membersCollection.where('email', isEqualTo: _email.trim()).get();
+        QuerySnapshot querySnapshot = await _membersCollection
+            .where('email', isEqualTo: _email.trim())
+            .get();
         if (querySnapshot.docs.isNotEmpty) {
           DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
           if (documentSnapshot.exists) {
@@ -47,7 +53,8 @@ class _TrainingScreenState extends State<TrainingScreen> {
               _lastName = documentSnapshot.get('lastName') ?? '';
               _email = documentSnapshot.get('email') ?? '';
             });
-            _getUserReports();  // Fetch user reports after getting user data
+            print('User data: ${documentSnapshot.data()}');
+            _getUserReports(); // Fetch user reports after getting user data
           } else {
             print('Document does not exist for email: $_email');
           }
@@ -62,18 +69,15 @@ class _TrainingScreenState extends State<TrainingScreen> {
 
   Future<void> _getUserReports() async {
     try {
-      // Use uid as userId
-      User? user = _auth.currentUser;
+      // Use firstName and lastName as userId
+      String userId = "$_firstName $_lastName";
 
-      if (user != null) {
-        String userId = user.uid;
+      List<pelaporan_bencana_model.Report> reports =
+      await pelaporan_bencana_model.Report.fetchReports(userId);
 
-        List<Report> reports = await Report.fetchReports(userId);
-
-        setState(() {
-          _userReports = reports;
-        });
-      }
+      setState(() {
+        _userReports = reports;
+      });
     } catch (e) {
       print('Error fetching user reports: $e');
     }
@@ -118,7 +122,9 @@ class _TrainingScreenState extends State<TrainingScreen> {
                 SizedBox(height: 16),
                 CircleAvatar(
                   radius: 60,
-                  child: Icon(Icons.person, size: 120), // You can replace this with any placeholder icon
+                  child: Icon(Icons.person,
+                      size:
+                      120), // You can replace this with any placeholder icon
                 ),
                 SizedBox(height: 16),
                 Text(
@@ -154,6 +160,14 @@ class _TrainingScreenState extends State<TrainingScreen> {
                 ListTile(
                   leading: Icon(Icons.support),
                   title: Text('Tentang Kami'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AreaListView(),
+                      ),
+                    );
+                  },
                 ),
                 ListTile(
                   leading: Icon(Icons.edit),
@@ -185,4 +199,10 @@ class _TrainingScreenState extends State<TrainingScreen> {
       ),
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: TrainingScreen(),
+  ));
 }

@@ -298,16 +298,12 @@ class _LaporPageState extends State<LaporPage> {
           final lastName = userData['lastName'] as String;
           final userId = '$firstName$lastName';
 
-          final now = tz.TZDateTime.now(tz.getLocation('Asia/Jakarta'));
-          final timestamp = Timestamp.fromDate(now);
-
           await FirebaseFirestore.instance.collection('laporan').add({
             'userId': userId,
             'imageUrl': imageUrl,
             'disasterType': _selectedDisasterType,
             'description': _keteranganController.text,
             'location': GeoPoint(_selectedLocation!.latitude, _selectedLocation!.longitude),
-            'timestamp': timestamp, // Menggunakan nilai timestamp yang sudah Anda definisikan sebelumnya
           });
 
           if (!mounted) return;  // Check if widget is still mounted before updating the state
