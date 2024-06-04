@@ -197,7 +197,7 @@ class _WeatherThemeState extends State<WeatherTheme> {
           depth: 8,
           intensity: 0.8,
           boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(10)),
-          color: Colors.grey.withOpacity(0.5),
+          color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.5),
         ),
         child: ExpansionTile(
           title: Text(
@@ -207,12 +207,16 @@ class _WeatherThemeState extends State<WeatherTheme> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          tilePadding: EdgeInsets.symmetric(horizontal: 16.0), // Mengatur padding tile
+          collapsedIconColor: Colors.black,
+          iconColor: Colors.black,
           children: forecasts.map((forecast) {
             return WeatherForecastCard(
               forecast: forecast,
               animationAsset: getWeatherAnimation(mainCondition: forecast.mainCondition),
             );
           }).toList(),
+
         ),
       ),
     );
@@ -248,55 +252,69 @@ class WeatherForecastCard extends StatelessWidget {
     return Card(
       elevation: 4,
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${forecast.dateTime.hour}:00',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          border: null,
+          borderRadius: BorderRadius.circular(15),
+          gradient: LinearGradient(
+            colors: [Colors.blue.withOpacity(0.5), Colors.blueAccent.withOpacity(0.3)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${forecast.dateTime.hour}:00',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  '${forecast.temperature.round()}°C',
-                  style: TextStyle(
-                    fontSize: 16,
+                  SizedBox(height: 5),
+                  Text(
+                    '${forecast.temperature.round()}°C',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  '${forecast.mainCondition}',
-                  style: TextStyle(
-                    fontSize: 16,
+                  SizedBox(height: 5),
+                  Text(
+                    '${forecast.mainCondition}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  'Wind Speed: ${forecast.windSpeed} m/s',
-                  style: TextStyle(
-                    fontSize: 16,
+                  SizedBox(height: 5),
+                  Text(
+                    'Wind Speed: ${forecast.windSpeed} m/s',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(width: 20),
-            SizedBox(
-              height: 60, // Atur tinggi gambar cuaca di sini
-              width: 60, // Atur lebar gambar cuaca di sini
-              child: Lottie.asset(
-                animationAsset,
-                repeat: true,
-                reverse: false,
+                ],
               ),
-            ),
-          ],
+              Spacer(),
+              SizedBox(
+                height: 60, // Atur tinggi gambar cuaca di sini
+                width: 60, // Atur lebar gambar cuaca di sini
+                child: Lottie.asset(
+                  animationAsset,
+                  repeat: true,
+                  reverse: false,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
