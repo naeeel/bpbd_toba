@@ -32,19 +32,19 @@ class _LocationPickerMapState extends State<LocationPickerMap> {
       ),
       body: GoogleMap(
         initialCameraPosition: CameraPosition(
-          target: _selectedLocation ?? LatLng(-6.2088, 106.8456),
-          zoom: 12.0,
+          target: _selectedLocation ?? LatLng(2.66687, 98.87571), // Approximate center of Danau Toba
+          zoom: 11.0, // Adjusted zoom for broader area
         ),
         markers: _selectedLocation != null
             ? {
-          Marker(
-            markerId: MarkerId("selectedLocation"),
-            position: _selectedLocation!,
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueRed,
-            ),
-          ),
-        }
+                Marker(
+                  markerId: MarkerId("selectedLocation"),
+                  position: _selectedLocation!,
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueRed,
+                  ),
+                ),
+              }
             : {},
         onTap: (LatLng latLng) {
           _onMapTap(latLng);
@@ -60,10 +60,41 @@ class _LocationPickerMapState extends State<LocationPickerMap> {
 
   // Metode untuk menangani ketika peta ditekan
   void _onMapTap(LatLng latLng) {
-    print("Map tapped at: $latLng");
-    setState(() {
-      _selectedLocation = latLng;
-    });
+    // Tentukan batas wilayah yang diizinkan di sekitar Danau Toba
+    const double minLat = 2.3;
+    const double maxLat = 3.1;
+    const double minLon = 98.5;
+    const double maxLon = 99.3;
+
+    // Periksa apakah titik yang ditekan berada dalam batasan wilayah yang diizinkan
+    if (latLng.latitude >= minLat &&
+        latLng.latitude <= maxLat &&
+        latLng.longitude >= minLon &&
+        latLng.longitude <= maxLon) {
+      // Titik yang ditekan berada dalam batasan wilayah yang diizinkan
+      setState(() {
+        _selectedLocation = latLng;
+      });
+    } else {
+      // Tampilkan pesan kesalahan jika titik yang ditekan diluar batas wilayah yang diizinkan
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Lokasi Tidak Diperbolehkan"),
+            content: Text("Anda tidak dapat memilih lokasi di luar wilayah yang diizinkan."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   // Metode untuk menangani ketika tombol Kirim ditekan
