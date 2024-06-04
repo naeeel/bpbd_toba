@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 
 class TitleView extends StatelessWidget {
   final String titleTxt;
-  final String subTxt;
   final AnimationController? animationController;
   final Animation<double>? animation;
 
   const TitleView(
       {Key? key,
       this.titleTxt: "",
-      this.subTxt: "Lihat selengkapnya",
       this.animationController,
       this.animation})
       : super(key: key);

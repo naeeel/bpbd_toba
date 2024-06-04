@@ -123,7 +123,7 @@ class MitigasiCardView extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                            )
+                            ) 
                           ],
                         ),
                       )

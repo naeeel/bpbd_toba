@@ -1,17 +1,18 @@
-import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/laporan_masyarakat_view.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/berita_masyarakat_view.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/bencana_terkini_view.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/title_view.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_theme.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/mitigasi_list_view.dart';
 import 'package:flutter/material.dart';
-class MyDiaryScreen extends StatefulWidget {
-  const MyDiaryScreen({Key? key, this.animationController}) : super(key: key);
+class BerandaScreen extends StatefulWidget {
+  const BerandaScreen({Key? key, this.animationController}) : super(key: key);
 
   final AnimationController? animationController;
   @override
-  _MyDiaryScreenState createState() => _MyDiaryScreenState();
+  _BerandaScreenState createState() => _BerandaScreenState();
 }
 
-class _MyDiaryScreenState extends State<MyDiaryScreen>
+class _BerandaScreenState extends State<BerandaScreen>
     with TickerProviderStateMixin {
   Animation<double>? topBarAnimation;
 
@@ -58,7 +59,7 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
     listViews.add(
       TitleView(
         titleTxt: 'Peringatan Dini',
-
+      
         animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
             parent: widget.animationController!,
             curve:
@@ -80,7 +81,6 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
     listViews.add(
       TitleView(
         titleTxt: 'Laporan Masyarakat',
-        subTxt: 'Today',
         animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
             parent: widget.animationController!,
             curve:
@@ -90,7 +90,7 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
     );
 
     listViews.add(
-      BodyMeasurementView(
+      BeritaMasyarakatView(
         animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
             parent: widget.animationController!,
             curve:
@@ -206,8 +206,6 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
                                 ),
                               ),
                             ),
-
-
                           ],
                         ),
                       )

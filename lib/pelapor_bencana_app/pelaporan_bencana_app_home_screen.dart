@@ -4,8 +4,8 @@ import 'package:pelaporan_bencana/pelapor_bencana_app/models/tabIcon_data.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/profil/profil_screen.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/bottom_navigation_view/bottom_bar_view.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_theme.dart';
-import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/peringatan_dini_screen.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/mitigasi/mitigasi_screen.dart';
+import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/beranda_screen_controller.dart';
 
 class PelaporansAppHomeScreen extends StatefulWidget {
   @override
@@ -32,7 +32,7 @@ class _PelaporansAppHomeScreenState extends State<PelaporansAppHomeScreen>
 
     animationController = AnimationController(
         duration: const Duration(milliseconds: 600), vsync: this);
-    tabBody = MyDiaryScreen(animationController: animationController);
+    tabBody = BerandaScreen(animationController: animationController);
     super.initState();
   }
 
@@ -89,7 +89,7 @@ class _PelaporansAppHomeScreenState extends State<PelaporansAppHomeScreen>
                 }
                 setState(() {
                   tabBody =
-                      MyDiaryScreen(animationController: animationController);
+                      BerandaScreen(animationController: animationController);
                 });
               });
             } else if (index == 1) {

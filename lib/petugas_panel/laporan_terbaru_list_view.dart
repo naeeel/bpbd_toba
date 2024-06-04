@@ -7,10 +7,10 @@ import 'package:pelaporan_bencana/main.dart';
 import 'package:pelaporan_bencana/petugas_panel/laporan_info_screen.dart';
 
 class LaporanTerbaruListView extends StatefulWidget {
- const LaporanTerbaruListView({Key? key, this.callBack}) : super(key: key);
+  const LaporanTerbaruListView({Key? key, this.callBack}) : super(key: key);
 
   final Function(Category)? callBack;
-  
+
   @override
   _LaporanTerbaruListViewState createState() => _LaporanTerbaruListViewState();
 }
@@ -33,31 +33,29 @@ class _LaporanTerbaruListViewState extends State<LaporanTerbaruListView>
     animationController?.dispose();
     super.dispose();
   }
-  
 
+  void moveTo(Category category) {
+    // Assuming category.location is a GeoPoint
+    String locationString =
+        "${category.location.latitude}, ${category.location.longitude}";
+    String formattedTimestamp =
+        DateFormat('dd MMM yyyy, hh:mm a').format(category.timestamp.toDate());
 
-void moveTo(Category category) {
-  // Assuming category.location is a GeoPoint
-  String locationString =
-      "${category.location.latitude}, ${category.location.longitude}";
-  String formattedTimestamp =
-      DateFormat('dd MMM yyyy, hh:mm a').format(category.timestamp.toDate());
-
-  Navigator.push<dynamic>(
-    context,
-    MaterialPageRoute<dynamic>(
-      builder: (BuildContext context) => LaporanInfoScreen(
-        id: category.id,
-        description: category.description,
-        disasterType: category.disasterType,
-        imageUrl: category.imageUrl,
-        location: locationString, // Pass the converted string here
-        timestamp: formattedTimestamp, // Pass the formatted timestamp here
-        userId: category.userId,
+    Navigator.push<dynamic>(
+      context,
+      MaterialPageRoute<dynamic>(
+        builder: (BuildContext context) => LaporanInfoScreen(
+          id: category.id,
+          description: category.description,
+          disasterType: category.disasterType,
+          imageUrl: category.imageUrl,
+          location: locationString, // Pass the converted string here
+          timestamp: formattedTimestamp, // Pass the formatted timestamp here
+          userId: category.userId,
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
   final bool isLoggedIn;
 
   MyApp({required this.isLoggedIn});
-
+  
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(

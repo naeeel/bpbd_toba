@@ -1,4 +1,4 @@
-import 'package:pelaporan_bencana/pelapor_bencana_app/beranda/mitigasi_list_view.dart';
+
 import 'package:pelaporan_bencana/pelapor_bencana_app/ui_view/area_list_view.dart';
 import 'package:pelaporan_bencana/pelapor_bencana_app/ui_view/mitigasi_pdf.dart';
 import 'package:flutter/material.dart';
