@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class MediterranesnDietView extends StatelessWidget {
+class PeringatanDiniView extends StatelessWidget {
   final AnimationController? animationController;
   final Animation<double>? animation;
 
-  const MediterranesnDietView(
+  const PeringatanDiniView(
       {Key? key, this.animationController, this.animation})
       : super(key: key);
 

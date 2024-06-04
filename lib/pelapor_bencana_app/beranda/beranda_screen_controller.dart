@@ -68,7 +68,7 @@ class _BerandaScreenState extends State<BerandaScreen>
       ),
     );
     listViews.add(
-      MediterranesnDietView(
+      PeringatanDiniView(
         animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
             parent: widget.animationController!,
             curve:
