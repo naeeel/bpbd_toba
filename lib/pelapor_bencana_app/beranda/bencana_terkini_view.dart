@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:pelaporan_bencana/pelapor_bencana_app/pelaporan_bencana_app_theme.dart';
+import 'package:pelaporan_bencana/main.dart';
+import 'package:flutter/material.dart';
+import 'dart:math' as math;
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MediterranesnDietView extends StatelessWidget {
   final AnimationController? animationController;
   final Animation<double>? animation;
 
-  const MediterranesnDietView({
-    Key? key,
-    this.animationController,
-    this.animation,
-  }) : super(key: key);
+  const MediterranesnDietView(
+      {Key? key, this.animationController, this.animation})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance.collection('peringatan').doc('sZ83ey7nEzo9buxZ87rs').snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+      stream: FirebaseFirestore.instance
+          .collection('peringatan')
+          .doc('sZ83ey7nEzo9buxZ87rs')
+          .snapshots(),
+      builder:
+          (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text("Error: ${snapshot.error}");
         }
@@ -38,32 +44,349 @@ class MediterranesnDietView extends StatelessWidget {
           builder: (BuildContext context, Widget? child) {
             return FadeTransition(
               opacity: animation!,
-              child: Transform(
-                transform: Matrix4.translationValues(0.0, 30 * (1.0 - animation!.value), 0.0),
+              child: new Transform(
+                transform: new Matrix4.translationValues(
+                    0.0, 30 * (1.0 - animation!.value), 0.0),
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 24, right: 24, top: 16, bottom: 18),
+                  padding: const EdgeInsets.only(
+                      left: 24, right: 24, top: 16, bottom: 18),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: PelaporansAppTheme.white,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(8.0),
-                        bottomLeft: Radius.circular(8.0),
-                        bottomRight: Radius.circular(8.0),
-                        topRight: Radius.circular(68.0),
-                      ),
+                          topLeft: Radius.circular(8.0),
+                          bottomLeft: Radius.circular(8.0),
+                          bottomRight: Radius.circular(8.0),
+                          topRight: Radius.circular(68.0)),
                       boxShadow: <BoxShadow>[
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          offset: Offset(1.1, 1.1),
-                          blurRadius: 10.0,
-                        ),
+                            color: PelaporansAppTheme.grey.withOpacity(0.2),
+                            offset: Offset(1.1, 1.1),
+                            blurRadius: 10.0),
                       ],
-                      border: Border.all(color: Color.fromARGB(255, 255, 0, 0), width: 2.0), // Menambahkan border berwarna orange
                     ),
                     child: Column(
                       children: <Widget>[
                         Padding(
-                          padding: const EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 16),
+                          padding: const EdgeInsets.only(
+                              top: 16, left: 16, right: 16),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8, right: 8, top: 4),
+                                  child: Column(
+                                    children: <Widget>[
+                                      Row(
+                                        children: <Widget>[
+                                          Container(
+                                            height: 48,
+                                            width: 2,
+                                            decoration: BoxDecoration(
+                                              color: HexColor('#87A0E5')
+                                                  .withOpacity(0.5),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(4.0)),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 4, bottom: 2),
+                                                  child: Text(
+                                                    'Laporan',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          PelaporansAppTheme
+                                                              .fontName,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 16,
+                                                      letterSpacing: -0.1,
+                                                      color: PelaporansAppTheme
+                                                          .grey
+                                                          .withOpacity(0.5),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  children: <Widget>[
+                                                    SizedBox(
+                                                      width: 28,
+                                                      height: 28,
+                                                      child: Icon(
+                                                        Icons
+                                                            .assignment, // Ganti dengan ikon yang sesuai seperti Icons.assignment
+                                                        color: Colors
+                                                            .green, // Sesuaikan warna ikon dengan kebutuhan Anda
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 4,
+                                                              bottom: 3),
+                                                      child: Text(
+                                                        '${(107 * animation!.value).toInt()}',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              PelaporansAppTheme
+                                                                  .fontName,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 16,
+                                                          color:
+                                                              PelaporansAppTheme
+                                                                  .darkerText,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 4,
+                                                              bottom: 3),
+                                                      child: Text(
+                                                        'Laporan',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              PelaporansAppTheme
+                                                                  .fontName,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 12,
+                                                          letterSpacing: -0.2,
+                                                          color:
+                                                              PelaporansAppTheme
+                                                                  .grey
+                                                                  .withOpacity(
+                                                                      0.5),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 8,
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Container(
+                                            height: 48,
+                                            width: 2,
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.green.withOpacity(0.5),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(4.0)),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 4, bottom: 2),
+                                                  child: Text(
+                                                    'Disetujui',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          PelaporansAppTheme
+                                                              .fontName,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 16,
+                                                      letterSpacing: -0.1,
+                                                      color: PelaporansAppTheme
+                                                          .grey
+                                                          .withOpacity(0.5),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  children: <Widget>[
+                                                    SizedBox(
+                                                      width: 28,
+                                                      height: 28,
+                                                      child: Icon(
+                                                        Icons
+                                                            .check_circle, // Ganti dengan ikon yang sesuai seperti Icons.check_circle
+                                                        color: Colors
+                                                            .green, // Sesuaikan warna ikon dengan kebutuhan Anda
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 4,
+                                                              bottom: 3),
+                                                      child: Text(
+                                                        '${(102 * animation!.value).toInt()}',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              PelaporansAppTheme
+                                                                  .fontName,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 16,
+                                                          color:
+                                                              PelaporansAppTheme
+                                                                  .darkerText,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 8,
+                                                              bottom: 3),
+                                                      child: Text(
+                                                        'laporan',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              PelaporansAppTheme
+                                                                  .fontName,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 12,
+                                                          letterSpacing: -0.2,
+                                                          color:
+                                                              PelaporansAppTheme
+                                                                  .grey
+                                                                  .withOpacity(
+                                                                      0.5),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 16),
+                                child: Center(
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          width: 100,
+                                          height: 100,
+                                          decoration: BoxDecoration(
+                                            color: PelaporansAppTheme.white,
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(100.0),
+                                            ),
+                                            border: new Border.all(
+                                              width: 4,
+                                              color: PelaporansAppTheme
+                                                  .nearlyDarkBlue
+                                                  .withOpacity(0.2),
+                                            ),
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: <Widget>[
+                                              Image.asset(
+                                                'assets/pelaporan_app/tsunami2.png', // Lokasi gambar
+                                                width:
+                                                    90, // Sesuaikan ukuran gambar dengan kebutuhan Anda
+                                                height: 90,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: CustomPaint(
+                                          painter: CurvePainter(
+                                            colors: [
+                                              PelaporansAppTheme.nearlyDarkBlue,
+                                              HexColor("#8A98E8"),
+                                              HexColor("#8A98E8"),
+                                            ],
+                                            angle: 140 +
+                                                (360 - 140) *
+                                                    (1.0 - animation!.value),
+                                          ),
+                                          child: SizedBox(
+                                            width: 108,
+                                            height: 108,
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 24, right: 24, top: 8, bottom: 8),
+                          child: Container(
+                            height: 2,
+                            decoration: BoxDecoration(
+                              color: PelaporansAppTheme.background,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4.0)),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 24, right: 24, top: 8, bottom: 16),
                           child: Row(
                             children: <Widget>[
                               Expanded(
@@ -75,9 +398,43 @@ class MediterranesnDietView extends StatelessWidget {
                                       peringatanDini,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
+                                        fontFamily: PelaporansAppTheme.fontName,
                                         fontWeight: FontWeight.w500,
                                         fontSize: 16,
-                                        color: Colors.black,
+                                        letterSpacing: -0.2,
+                                        color: PelaporansAppTheme.darkText,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4),
+                                      child: Container(
+                                        height: 4,
+                                        width: 70,
+                                        decoration: BoxDecoration(
+                                          color: HexColor('#87A0E5')
+                                              .withOpacity(0),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(0)),
+                                        ),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Container(
+                                              width: ((70 / 1.2) *
+                                                  animation!.value),
+                                              height: 4,
+                                              decoration: BoxDecoration(
+                                                gradient:
+                                                    LinearGradient(colors: [
+                                                  HexColor('#87A0E5'),
+                                                  HexColor('#87A0E5')
+                                                      .withOpacity(0.5),
+                                                ]),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(4.0)),
+                                              ),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
                                     Padding(
@@ -86,9 +443,12 @@ class MediterranesnDietView extends StatelessWidget {
                                         loremIpsum,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
+                                          fontFamily:
+                                              PelaporansAppTheme.fontName,
                                           fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                          color: const Color.fromARGB(255, 4, 4, 4).withOpacity(0.5),
+                                          fontSize: 12,
+                                          color: PelaporansAppTheme.grey
+                                              .withOpacity(0.5),
                                         ),
                                       ),
                                     ),
@@ -110,8 +470,6 @@ class MediterranesnDietView extends StatelessWidget {
     );
   }
 }
-
-
 
 class CurvePainter extends CustomPainter {
   final double? angle;
