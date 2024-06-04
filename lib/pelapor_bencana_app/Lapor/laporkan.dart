@@ -8,15 +8,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' show LatLng;
 import 'package:pelaporan_bencana/pelapor_bencana_app/Lapor/location_picker_map.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FirebaseAppCheck.instance.activate();
-  tz.initializeTimeZones();
   runApp(LaporApp());
 }
 
