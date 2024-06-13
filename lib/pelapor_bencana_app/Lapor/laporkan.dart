@@ -8,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' show LatLng;
 import 'package:pelaporan_bencana/pelapor_bencana_app/Lapor/location_picker_map.dart';
+import 'package:intl/intl.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -292,6 +293,8 @@ class _LaporPageState extends State<LaporPage> {
           final firstName = userData['firstName'] as String;
           final lastName = userData['lastName'] as String;
           final userId = '$firstName$lastName';
+          final currentTimestamp = DateTime.now();
+          final timestamp = Timestamp.fromDate(currentTimestamp); // Store the timestamp as a Timestamp
 
           await FirebaseFirestore.instance.collection('laporan').add({
             'userId': userId,
@@ -299,6 +302,7 @@ class _LaporPageState extends State<LaporPage> {
             'disasterType': _selectedDisasterType,
             'description': _keteranganController.text,
             'location': GeoPoint(_selectedLocation!.latitude, _selectedLocation!.longitude),
+            'timestamp': timestamp, // Menyimpan timestamp sebagai Timestamp
           });
 
           if (!mounted) return;  // Check if widget is still mounted before updating the state
@@ -308,6 +312,9 @@ class _LaporPageState extends State<LaporPage> {
             _selectedLocation = null;
             _keteranganController.clear();
           });
+
+          final formattedDateTime = DateFormat.yMMMMd().add_jm().add_jms().format(currentTimestamp) + ' UTC+7';
+          print('timestamp $formattedDateTime');
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -367,54 +374,67 @@ class _LaporPageState extends State<LaporPage> {
   }
 
   void _showDisasterPicker(BuildContext context) {
-    showCupertinoModalPopup(
+    showCupertinoModalPopup<void>(
       context: context,
-      builder: (_) => Container(
-        height: 250,
-        color: Color.fromARGB(255, 255, 255, 255),
-        child: Column(
-          children: [
-            Container(
-              height: 200,
-              child: CupertinoPicker(
-                backgroundColor: Colors.white,
-                itemExtent: 30,
-                scrollController: FixedExtentScrollController(
-                  initialItem: 0,
-                ),
-                onSelectedItemChanged: (int index) {
-                  setState(() {
-                    _selectedDisasterType = _disasterTypes[index];
-                  });
-                },
-                children: _disasterTypes
-                    .map((item) => Center(child: Text(item)))
-                    .toList(),
-              ),
-            ),
-            CupertinoButton(
-              child: Text('Pilih'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
+      builder: (BuildContext context) => CupertinoActionSheet(
+        title: const Text('Pilih Jenis Bencana'),
+        actions: <CupertinoActionSheetAction>[
+          CupertinoActionSheetAction(
+            child: const Text('Gempa Bumi'),
+            onPressed: () {
+              setState(() {
+                _selectedDisasterType = 'Gempa Bumi';
+              });
+              Navigator.pop(context);
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: const Text('Tsunami'),
+            onPressed: () {
+              setState(() {
+                _selectedDisasterType = 'Tsunami';
+              });
+              Navigator.pop(context);
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: const Text('Banjir'),
+            onPressed: () {
+              setState(() {
+                _selectedDisasterType = 'Banjir';
+              });
+              Navigator.pop(context);
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: const Text('Tanah Longsor'),
+            onPressed: () {
+              setState(() {
+                _selectedDisasterType = 'Tanah Longsor';
+              });
+              Navigator.pop(context);
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: const Text('Kebakaran Hutan'),
+            onPressed: () {
+              setState(() {
+                _selectedDisasterType = 'Kebakaran Hutan';
+              });
+              Navigator.pop(context);
+            },
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          child: const Text('Batal'),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
     );
   }
-
-  final List<String> _disasterTypes = [
-    'Gempa Bumi',
-    'Banjir',
-    'Tanah Longsor',
-    'Kebakaran',
-    'Badai',
-    'Tsunami',
-    'Erupsi Gunung',
-    'Lainnya',
-  ];
 }
-
-enum ReportStatus { sent, inProgress, completed, rejected }
 
 class Report {
   final String id;
@@ -424,7 +444,7 @@ class Report {
   final double latitude;
   final double longitude;
   final String keterangan;
-  final int timestamp;
+  final Timestamp timestamp;
   final ReportStatus status;
 
   Report({
@@ -444,11 +464,11 @@ class Report {
       id: snapshot.id,
       userId: snapshot['userId'] ?? '',
       disasterType: snapshot['disasterType'] ?? '',
-      imagePath: snapshot['imagePath'] ?? '',
-      latitude: (snapshot['latitude'] ?? 0.0) as double,
-      longitude: (snapshot['longitude'] ?? 0.0) as double,
-      keterangan: snapshot['keterangan'] ?? '',
-      timestamp: (snapshot['timestamp'] ?? 0) as int,
+      imagePath: snapshot['imageUrl'] ?? '',
+      latitude: (snapshot['location'].latitude ?? 0.0) as double,
+      longitude: (snapshot['location'].longitude ?? 0.0) as double,
+      keterangan: snapshot['description'] ?? '',
+      timestamp: snapshot['timestamp'] ?? Timestamp.now(),
       status: _getStatusFromString(snapshot['status'] ?? ''),
     );
   }
@@ -480,4 +500,25 @@ class Report {
         return Icon(Icons.close);
     }
   }
+}
+
+enum ReportStatus {
+  sent,
+  inProgress,
+  completed,
+  rejected,
+}
+
+void displayReport(DocumentSnapshot snapshot) {
+  final report = Report.fromSnapshot(snapshot);
+
+  final DateTime dateTime = report.timestamp.toDate();
+  final String formattedDateTime = DateFormat.yMMMMd().add_jm().add_jms().format(dateTime) + ' UTC+7';
+
+  print('description: ${report.keterangan}');
+  print('disasterType: ${report.disasterType}');
+  print('imageUrl: ${report.imagePath}');
+  print('location: [${report.latitude}° N, ${report.longitude}° E]');
+  print('timestamp: $formattedDateTime');
+  print('userId: ${report.userId}');
 }

@@ -15,30 +15,16 @@ class ReportHistoryScreen extends StatelessWidget {
       body: userReports.isEmpty
           ? Center(child: Text('Belum ada laporan yang dikirim.'))
           : ListView.builder(
-              itemCount: userReports.length,
-              itemBuilder: (context, index) {
-                final report = userReports[index];
-                return Card(
-                  margin: EdgeInsets.all(10),
-                  child: ListTile(
-                    leading: report.getStatusIcon(),
-                    title: Text(report.disasterType),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(report.keterangan),
-                        Text('Lokasi: ${report.latitude}, ${report.longitude}'),
-                        Text('Waktu: ${report.getFormattedTimestamp()}'),
-                      ],
-                    ),
-                    trailing: Icon(Icons.arrow_forward),
-                    onTap: () {
-// Optionally, implement navigation to a detailed report screen
-                    },
-                  ),
-                );
-              },
-            ),
+        itemCount: userReports.length,
+        itemBuilder: (context, index) {
+          final report = userReports[index];
+          return ListTile(
+            leading: report.getStatusIcon(),
+            title: Text(report.disasterType),
+            subtitle: Text(report.getFormattedTimestamp()),
+          );
+        },
+      ),
     );
   }
 }

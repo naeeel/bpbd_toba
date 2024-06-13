@@ -39,7 +39,7 @@ class _LaporanTerbaruListViewState extends State<LaporanTerbaruListView>
     String locationString =
         "${category.location.latitude}, ${category.location.longitude}";
     String formattedTimestamp =
-        DateFormat('dd MMM yyyy, hh:mm a').format(category.timestamp.toDate());
+    DateFormat('dd MMM yyyy, hh:mm a').format(category.timestamp.toDate());
 
     Navigator.push<dynamic>(
       context,
@@ -79,6 +79,9 @@ class _LaporanTerbaruListViewState extends State<LaporanTerbaruListView>
             } else {
               List<Category> categories = snapshot.data!;
 
+              // Urutkan categories berdasarkan timestamp
+              categories.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
               return ListView.builder(
                 padding: const EdgeInsets.only(
                   top: 0,
@@ -90,9 +93,9 @@ class _LaporanTerbaruListViewState extends State<LaporanTerbaruListView>
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (BuildContext context, int index) {
                   final int count =
-                      categories.length > 10 ? 10 : categories.length;
+                  categories.length > 10? 10 : categories.length;
                   final Animation<double> animation =
-                      Tween<double>(begin: 0.0, end: 1.0).animate(
+                  Tween<double>(begin: 0.0, end: 1.0).animate(
                     CurvedAnimation(
                       parent: animationController!,
                       curve: Interval(
@@ -182,7 +185,7 @@ class CategoryView extends StatelessWidget {
                                     child: Container(
                                       child: Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: <Widget>[
                                           Padding(
                                             padding: const EdgeInsets.only(
@@ -218,7 +221,7 @@ class CategoryView extends StatelessWidget {
                                                 fontSize: 12,
                                                 letterSpacing: 0.27,
                                                 color:
-                                                    DesignPetugasAppTheme.grey,
+                                                DesignPetugasAppTheme.grey,
                                               ),
                                             ),
                                           ),
@@ -235,7 +238,7 @@ class CategoryView extends StatelessWidget {
                                                 fontSize: 12,
                                                 letterSpacing: 0.27,
                                                 color:
-                                                    DesignPetugasAppTheme.grey,
+                                                DesignPetugasAppTheme.grey,
                                               ),
                                             ),
                                           ),
