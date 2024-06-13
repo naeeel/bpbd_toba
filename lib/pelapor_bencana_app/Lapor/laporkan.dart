@@ -424,6 +424,24 @@ class _LaporPageState extends State<LaporPage> {
               Navigator.pop(context);
             },
           ),
+          CupertinoActionSheetAction(
+            child: const Text('Kebakaran Hutan'),
+            onPressed: () {
+              setState(() {
+                _selectedDisasterType = 'Kebakaran Hutan';
+              });
+              Navigator.pop(context);
+            },
+          ),  
+          CupertinoActionSheetAction(
+            child: const Text('Badai'),
+            onPressed: () {
+              setState(() {
+                _selectedDisasterType = 'Badai';
+              });
+              Navigator.pop(context);
+            },
+          ),                  
         ],
         cancelButton: CupertinoActionSheetAction(
           child: const Text('Batal'),
