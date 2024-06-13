@@ -257,100 +257,89 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen>
                               Expanded(
                                 child: AnimatedOpacity(
                                   duration: const Duration(milliseconds: 500),
-                                  opacity: opacity2,
+                                    opacity: opacity2,
                                   child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 16, right: 16, top: 8, bottom: 8),
-                                    child: SingleChildScrollView(
+                                    padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
+                                      child: SingleChildScrollView(
                                       scrollDirection: Axis.vertical,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: <Widget>[
-                                          Text(
-                                            widget.description,
-                                            textAlign: TextAlign.justify,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w200,
-                                              fontSize: 14,
-                                              letterSpacing: 0.27,
-                                              color: DesignPetugasAppTheme.grey,
-                                            ),
-                                          ),
-                                        ],
+                                      Text(
+                                        widget.description,
+                                        textAlign: TextAlign.justify,
+                                          style: TextStyle(
+                                          fontWeight: FontWeight.w200,
+                                          fontSize: 14,
+                                          letterSpacing: 0.27,
+                                          color: DesignPetugasAppTheme.grey,
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              AnimatedOpacity(
-                                duration: const Duration(milliseconds: 500),
-                                opacity: opacity3,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 16, bottom: 16, right: 16),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      Container(
-                                        width: 48,
-                                        height: 48,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: DesignPetugasAppTheme
-                                                .nearlyWhite,
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                              Radius.circular(16.0),
-                                            ),
-                                            border: Border.all(
-                                                color: DesignPetugasAppTheme
-                                                    .grey
-                                                    .withOpacity(0.2)),
-                                          ),
-                                          child: Icon(
-                                            Icons.add,
-                                            color: DesignPetugasAppTheme
-                                                .nearlyBPBD,
-                                            size: 28,
-                                          ),
-                                        ),
+                            ),
+                          ),
+                          AnimatedOpacity(
+                            duration: const Duration(milliseconds: 500),
+                            opacity: opacity3,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 16, bottom: 16, right: 16),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                  width: 48,
+                                  height: 48,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: DesignPetugasAppTheme.nearlyWhite,
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(16.0),
                                       ),
-                                      const SizedBox(
-                                        width: 16,
+                                      border: Border.all(
+                                        color: DesignPetugasAppTheme.grey.withOpacity(0.2)),
                                       ),
-                                      Expanded(
-                                        child: Container(
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 16,
+                                  ),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        if (phoneNumber.isNotEmpty && phoneNumber != 'Phone not available') {
+                                         _launchPhoneCall(phoneNumber);
+                                        } else {
+                                        }
+                                      },
+                                      child: Container(
                                           height: 48,
                                           decoration: BoxDecoration(
-                                            color: DesignPetugasAppTheme
-                                                .nearlyBPBD,
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                              Radius.circular(16.0),
-                                            ),
-                                            boxShadow: <BoxShadow>[
-                                              BoxShadow(
-                                                  color: DesignPetugasAppTheme
-                                                      .nearlyBPBD
-                                                      .withOpacity(0.5),
-                                                  offset:
-                                                      const Offset(1.1, 1.1),
-                                                  blurRadius: 10.0),
-                                            ],
+                                          color: DesignPetugasAppTheme.nearlyBPBD,
+                                          borderRadius: const BorderRadius.all(
+                                            Radius.circular(16.0),
                                           ),
-                                          child: Center(
-                                            child: Text(
-                                              'Hubungi Kami',
-                                              textAlign: TextAlign.left,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 18,
-                                                letterSpacing: 0.0,
-                                                color: DesignPetugasAppTheme
-                                                    .nearlyWhite,
+                                          boxShadow: <BoxShadow>[
+                                            BoxShadow(
+                                              color: DesignPetugasAppTheme.nearlyBPBD.withOpacity(0.5),
+                                              offset: const Offset(1.1, 1.1),
+                                              blurRadius: 10.0,
+                                            ),
+                                            ],
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  'Hubungi Kami',
+                                                  textAlign: TextAlign.left,
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 18,
+                                                    letterSpacing: 0.0,
+                                                  color: DesignPetugasAppTheme.nearlyWhite,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -381,54 +370,6 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen>
                 ),
                 child: Row(
                   children: <Widget>[
-                    Container(
-                      width: 60,
-                      height: 60,
-                      child: Center(
-                        child: Icon(
-                          Icons.call,
-                          color: DesignPetugasAppTheme.nearlyWhite,
-                          size: 30,
-                        ),
-                      ),
-                      decoration: BoxDecoration(
-                        color: DesignPetugasAppTheme.nearlyBPBD,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Container(
-                      width: 60,
-                      height: 60,
-                      child: Center(
-                        child: Icon(
-                          Icons.clear,
-                          color: DesignPetugasAppTheme.nearlyWhite,
-                          size: 30,
-                        ),
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red, // Warna latar belakang untuk tolak
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Container(
-                      width: 60,
-                      height: 60,
-                      child: Center(
-                        child: Icon(
-                          Icons.check,
-                          color: DesignPetugasAppTheme.nearlyWhite,
-                          size: 30,
-                        ),
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                            Colors.green, // Warna latar belakang untuk terima
-                        shape: BoxShape.circle,
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -521,11 +462,22 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen>
   }
 
   void _launchPhoneCall(String phoneNumber) async {
+  try {
+    // Ensure phoneNumber starts with '0'
+    if (!phoneNumber.startsWith('0')) {
+      phoneNumber = '0$phoneNumber';
+    }
+
     final url = 'tel:$phoneNumber';
     if (await canLaunch(url)) {
       await launch(url);
     } else {
       throw 'Could not launch $url';
     }
+  } catch (e) {
+    print('Error launching phone call: $e');
+    // Handle error as needed
   }
+}
+
 }
