@@ -332,7 +332,7 @@ class _LaporanInfoScreenState extends State<LaporanInfoScreen>
                                               ),
                                               child: Center(
                                                 child: Text(
-                                                  'Hubungi Kami',
+                                                  'Hubungi Pelapor',
                                                   textAlign: TextAlign.left,
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w600,

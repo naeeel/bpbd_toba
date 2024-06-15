@@ -72,52 +72,7 @@ class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
         const SizedBox(
           height: 16,
         ),
-        SizedBox(
-          height: 50,
-          child: ListView(
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            scrollDirection: Axis.horizontal,
-            children: <Widget>[
-              getButtonUI(
-                  CategoryType.gempa, categoryType == CategoryType.gempa),
-              const SizedBox(
-                width: 16,
-              ),
-              getButtonUI(
-                  CategoryType.banjir, categoryType == CategoryType.banjir),
-              const SizedBox(
-                width: 16,
-              ),
-              getButtonUI(CategoryType.kebakaran,
-                  categoryType == CategoryType.kebakaran),
-              const SizedBox(
-                width: 16,
-              ),
-              getButtonUI(
-                  CategoryType.longsor, categoryType == CategoryType.longsor),
-              const SizedBox(
-                width: 16,
-              ),
-              getButtonUI(
-                  CategoryType.gunung, categoryType == CategoryType.gunung),
-              const SizedBox(
-                width: 16,
-              ),
-              getButtonUI(
-                  CategoryType.angin, categoryType == CategoryType.angin),
-              const SizedBox(
-                width: 16,
-              ),
-              getButtonUI(
-                  CategoryType.tsunami, categoryType == CategoryType.tsunami),
-              const SizedBox(
-                width: 16,
-              ),
-              getButtonUI(
-                  CategoryType.lainnya, categoryType == CategoryType.lainnya),
-            ],
-          ),
-        ),
+        
         const SizedBox(
           height: 16,
         ),
@@ -269,45 +224,45 @@ class _DesignCourseHomeScreenState extends State<DesignCourseHomeScreen> {
                     topRight: Radius.circular(13.0),
                   ),
                 ),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.only(left: 16, right: 16),
-                        child: TextFormField(
-                          style: TextStyle(
-                            fontFamily: 'WorkSans',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: DesignPetugasAppTheme.nearlyBPBD,
-                          ),
-                          keyboardType: TextInputType.text,
-                          decoration: InputDecoration(
-                            labelText: 'Cari bencana',
-                            border: InputBorder.none,
-                            helperStyle: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: HexColor('#B9BABC'),
-                            ),
-                            labelStyle: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                              letterSpacing: 0.2,
-                              color: HexColor('#B9BABC'),
-                            ),
-                          ),
-                          onEditingComplete: () {},
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: Icon(Icons.search, color: HexColor('#B9BABC')),
-                    )
-                  ],
-                ),
+                // child: Row(
+                //   children: <Widget>[
+                //     Expanded(
+                //       child: Container(
+                //         padding: const EdgeInsets.only(left: 16, right: 16),
+                //         child: TextFormField(
+                //           style: TextStyle(
+                //             fontFamily: 'WorkSans',
+                //             fontWeight: FontWeight.bold,
+                //             fontSize: 16,
+                //             color: DesignPetugasAppTheme.nearlyBPBD,
+                //           ),
+                //           keyboardType: TextInputType.text,
+                //           decoration: InputDecoration(
+                //             labelText: 'Cari bencana',
+                //             border: InputBorder.none,
+                //             helperStyle: TextStyle(
+                //               fontWeight: FontWeight.bold,
+                //               fontSize: 16,
+                //               color: HexColor('#B9BABC'),
+                //             ),
+                //             labelStyle: TextStyle(
+                //               fontWeight: FontWeight.w600,
+                //               fontSize: 16,
+                //               letterSpacing: 0.2,
+                //               color: HexColor('#B9BABC'),
+                //             ),
+                //           ),
+                //           onEditingComplete: () {},
+                //         ),
+                //       ),
+                //     ),
+                //     SizedBox(
+                //       width: 60,
+                //       height: 60,
+                //       child: Icon(Icons.search, color: HexColor('#B9BABC')),
+                //     )
+                //   ],
+                // ),
               ),
             ),
           ),
